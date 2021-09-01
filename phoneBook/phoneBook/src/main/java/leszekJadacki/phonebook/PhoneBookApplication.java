@@ -1,5 +1,6 @@
-package leszekJadacki.phoneBook;
+package leszekJadacki.phonebook;
 
+import leszekJadacki.phonebook.person.Person;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,7 @@ public class PhoneBookApplication {
 	}
 
 	@GetMapping
-	public List<String> HelloWorld(){
-		return List.of("SIEEEEEMANKO!!!", "Brachuu!");
+	public String welcomePage(){
+		return "Welcome to the show!";
 	}
 }
