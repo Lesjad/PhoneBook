@@ -1,16 +1,13 @@
-package leszekJadacki.phonebook.person;
-
-import org.springframework.lang.NonNullFields;
+package leszekJadacki.phonebook.contact;
 
 import javax.persistence.*;
-import java.awt.Image;
 
 @Entity
 @Table
-public class Person {
+public class Contact {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "person_sequence")
-    @SequenceGenerator(name = "person_sequence", sequenceName = "person_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "contact_sequence")
+    @SequenceGenerator(name = "contact_sequence", sequenceName = "contact_sequence", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -34,15 +31,15 @@ public class Person {
         this.id = id;
     }
 
-    public Person() {
+    public Contact() {
     }
 
-    public Person(String name,
-                  String surname,
-                  String phoneHome,
-                  String phoneWork,
-                  String email,
-                  String photo) {
+    public Contact(String name,
+                   String surname,
+                   String phoneHome,
+                   String phoneWork,
+                   String email,
+                   String photo) {
         this.name = name;
         this.surname = surname;
         this.phoneHome = phoneHome;
@@ -51,11 +48,11 @@ public class Person {
         this.photo = photo;
     }
 
-    public Person(String name,
-                  String surname,
-                  String phoneHome,
-                  String phoneWork,
-                  String email) {
+    public Contact(String name,
+                   String surname,
+                   String phoneHome,
+                   String phoneWork,
+                   String email) {
         this.name = name;
         this.surname = surname;
         this.phoneHome = phoneHome;
@@ -65,7 +62,7 @@ public class Person {
 
     @Override
     public String toString() {
-        return "Person{" +
+        return "Contact{" +
                 "name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
                 ", phoneHome='" + phoneHome + '\'' +

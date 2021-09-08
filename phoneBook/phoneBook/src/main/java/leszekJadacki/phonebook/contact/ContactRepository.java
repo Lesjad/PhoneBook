@@ -1,8 +1,8 @@
-package leszekJadacki.phonebook.person;
+package leszekJadacki.phonebook.contact;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PersonRepository extends JpaRepository<Person, Long> {
+public interface ContactRepository extends JpaRepository<Contact, Long> {
 }

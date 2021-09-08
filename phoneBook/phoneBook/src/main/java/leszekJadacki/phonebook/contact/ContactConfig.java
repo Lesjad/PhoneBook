@@ -1,28 +1,25 @@
-package leszekJadacki.phonebook.person;
+package leszekJadacki.phonebook.contact;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
 @Configuration
-public class PersonConfig {
+public class ContactConfig {
 
+/*
     @Bean
-    CommandLineRunner commandLineRunner(PersonRepository repository){
+    CommandLineRunner commandLineRunner(ContactRepository repository){
         return args -> {
-            Person jan = new Person("Jan",
+            Contact jan = new Contact("Jan",
                     "Kowalski",
                     "22 606 60 60",
                     "+48 123 456 789",
                     "janko@domena.com");
-            Person zbyszek = new Person("Zbigniew",
+            Contact zbyszek = new Contact("Zbigniew",
                     "Niedbalski",
                     "22 606 60 60",
                     "+48 123 456 789",
                     "zbinie@domena.com");
-            Person zbyszekDrugi = new Person("ZbigniewDrugi",
+            Contact zbyszekDrugi = new Contact("ZbigniewDrugi",
                     "NiedbalskiBardzo",
                     "22 616 61 61",
                     "+48 987 654 321",
@@ -31,4 +28,5 @@ public class PersonConfig {
             repository.saveAll(List.of(jan, zbyszek));
         };
     }
+*/
 }
