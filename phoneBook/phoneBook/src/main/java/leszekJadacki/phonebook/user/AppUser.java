@@ -1,7 +1,7 @@
 package leszekJadacki.phonebook.user;
 
 import leszekJadacki.phonebook.contact.Contact;
-import org.springframework.transaction.annotation.Transactional;
+import leszekJadacki.phonebook.user.role.Role;
 
 import javax.persistence.*;
 import java.util.ArrayList;

@@ -26,4 +26,8 @@ public class ContactService {
     public void updateContactData(Contact contact) {
         //TODO: create logic for updateContactData(Contact contact);
     }
+
+    public Contact findByName(String contactName) {
+        return contactRepository.findByName(contactName);
+    }
 }

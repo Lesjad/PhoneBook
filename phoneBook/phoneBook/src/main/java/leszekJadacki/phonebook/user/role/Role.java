@@ -1,4 +1,4 @@
-package leszekJadacki.phonebook.user;
+package leszekJadacki.phonebook.user.role;
 
 import javax.persistence.*;
 
@@ -15,6 +15,10 @@ public class Role {
         this.name = name;
     }
 
+    public Role(String name) {
+        this.name = name;
+    }
+
     public Role() {
     }
 
@@ -24,10 +28,6 @@ public class Role {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Role(String name) {
-        this.name = name;
     }
 
     public String getName() {

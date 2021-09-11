@@ -1,5 +1,8 @@
 package leszekJadacki.phonebook.user;
 
+import leszekJadacki.phonebook.contact.Contact;
+import leszekJadacki.phonebook.user.role.Role;
+import leszekJadacki.phonebook.user.role.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,30 +24,36 @@ public class AppUserService {
         this.roleRepository = roleRepository;
     }
 
-    AppUser saveUser(AppUser user){
+    public AppUser saveUser(AppUser user){
         log.info("Saving user " + user.getUserName() + " to the database");
         return userRepository.save(user);
     }
 
-    Role saveRole(Role role){
+    public Role saveRole(Role role){
         log.info("Saving role " + role.getName() + " to the database");
         return roleRepository.save(role);
     }
 
-    void addRoleToUser(String userName, String roleName){
+    public void addRoleToUser(String userName, String roleName){
         log.info("Adding role " + roleName + " to the user " + userName);
         AppUser user = userRepository.findByUserName(userName);
         Role role=roleRepository.findByName(roleName);
         user.getRoles().add(role);
     }
 
-    AppUser getUser(String userName){
+    public AppUser getUser(String userName){
         log.info("Fetching user " + userName + " from the database");
         return userRepository.findByUserName(userName);
     }
 
-    List<AppUser> getUsers(){
+    public List<AppUser> getUsers(){
         log.info("Getting all users");
         return userRepository.findAll();
+    }
+
+    public AppUser addContactToUser(AppUser user, Contact contact) {
+        userRepository.findByUserName(user.getUserName())
+                .getContactList().add(contact);
+        return user;
     }
 }

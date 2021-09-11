@@ -1,4 +1,4 @@
-package leszekJadacki.phonebook.user;
+package leszekJadacki.phonebook.user.role;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
