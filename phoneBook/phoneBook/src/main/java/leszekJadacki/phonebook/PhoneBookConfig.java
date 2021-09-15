@@ -1,6 +1,5 @@
 package leszekJadacki.phonebook;
 
-import leszekJadacki.phonebook.contact.Contact;
 import leszekJadacki.phonebook.contact.ContactRepository;
 import leszekJadacki.phonebook.user.AppUser;
 import leszekJadacki.phonebook.user.AppUserService;
@@ -14,7 +13,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.NoSuchElementException;
 
 @Configuration
 public class PhoneBookConfig {
@@ -23,23 +22,25 @@ public class PhoneBookConfig {
         return args -> {
 
 //Creating test Contacts
-            Contact jan = new Contact("Jan",
+/*            Contact jan = new Contact("Jan",
                     "Kowalski",
                     "22 606 60 60",
                     "+48 123 456 789",
                     "janko@domena.com");
+
             Contact zbyszek = new Contact("Zbigniew",
                     "Niedbalski",
                     "22 606 60 60",
                     "+48 123 456 789",
                     "zbinie@domena.com");
+
             Contact zbyszekDrugi = new Contact("ZbigniewDrugi",
                     "NiedbalskiBardzo",
                     "22 616 61 61",
                     "+48 987 654 321",
-                    "zbinie@domena1.com");
+                    "zbinie@domena1.com");*/
 
-            repository.saveAll(List.of(jan, zbyszek, zbyszekDrugi));
+//            repository.saveAll(List.of(jan, zbyszek, zbyszekDrugi));
 
             //Createing test roles
             userService.saveRole(new Role(null, "ROLE_USER"));
@@ -51,6 +52,7 @@ public class PhoneBookConfig {
                     new AppUser(
                             null,
                             "Leszek",
+                            "LeszekLogin",
                             "zxcvb",
                             new ArrayList<>(),
                             new ArrayList<>()));
@@ -58,26 +60,29 @@ public class PhoneBookConfig {
                     new AppUser(
                             null,
                             "Lesio",
+                            "LesioLogin",
                             "1234",
                             new ArrayList<>(),
                             new ArrayList<>()));
             userService.saveUser(
                     new AppUser(
-                            null, "Leszeczek",
+                            null,
+                            "Leszeczek",
+                            "LeszeczekLogin",
                             "qwerty",
                             new ArrayList<>(),
                             new ArrayList<>()));
 
             //Adding contacts to users
+            /*userService.addContactToUser(
+                    userService.getUser("LesioLogin"),
+                    repository.findByName("Jan").orElseThrow(() -> new NoSuchElementException()));
             userService.addContactToUser(
-                    userService.getUser("Lesio"),
-                    repository.findByName("Jan"));
-            userService.addContactToUser(
-                    userService.getUser("Leszeczek"),
-                    repository.findByName("Jan"));
+                    userService.getUser("LeszeczekLogin"),
+                    repository.findByName("Jan").orElseThrow(() -> new NoSuchElementException()));*/
 
-            System.out.println("Application started ... launching browser now");
-            browse("http://localhost:8080/api");
+            /*System.out.println("Application started ... launching browser now");
+            browse("http://localhost:8080/api/post-contact");*/
         };
     }
     public static void browse(String url) {

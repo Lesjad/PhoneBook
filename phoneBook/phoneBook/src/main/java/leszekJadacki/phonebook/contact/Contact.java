@@ -6,8 +6,7 @@ import javax.persistence.*;
 @Table
 public class Contact {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "contact_sequence")
-    @SequenceGenerator(name = "contact_sequence", sequenceName = "contact_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -70,6 +69,16 @@ public class Contact {
                 ", email='" + email + '\'' +
                 ", photo=" + photo +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        Contact obj = (Contact) object;
+        return (this.name.equals(obj.name) &&
+                this.surname.equals(obj.surname) &&
+                this.phoneHome.equals(obj.phoneHome) &&
+                this.phoneWork.equals(obj.phoneWork) &&
+                this.email.equals(obj.email));
     }
 
     public String getName() {

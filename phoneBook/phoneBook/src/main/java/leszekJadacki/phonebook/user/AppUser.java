@@ -16,22 +16,37 @@ public class AppUser {
     private Long id;
 
     private String userName;
+    private String login;
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<Role> roles = new ArrayList<>();
-    @ManyToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
     private Collection<Contact> contactList = new ArrayList<>();
 
     public AppUser() {
     }
-
+//Constructor without ID
+    public AppUser(String userName,
+                   String login,
+                   String password,
+                   Collection<Role> roles,
+                   Collection<Contact> contactList) {
+        this.userName = userName;
+        this.login = login;
+        this.password = password;
+        this.roles = roles;
+        this.contactList = contactList;
+    }
+//Constructor with all fields
     public AppUser(Long id,
                    String userName,
+                   String login,
                    String password,
                    Collection<Role> roles,
                    Collection<Contact> contactList) {
         this.id = id;
         this.userName = userName;
+        this.login = login;
         this.password = password;
         this.roles = roles;
         this.contactList = contactList;
@@ -52,6 +67,14 @@ public class AppUser {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getPassword() {

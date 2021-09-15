@@ -1,0 +1,70 @@
+body {
+    background-color: cornsilk;
+}
+
+.header {
+    text-align: center;
+}
+
+.pagesInfo input {
+    max-width: 40px;
+    text-align: center;
+}
+
+
+.charsDisplayInfo {
+    display: inline-block;
+    font-family: fantasy;
+    font-size: x-large;
+}
+
+.charListContainer{
+    display: flex;
+    flex-direction: row;
+}
+
+.singleCharacter {
+    display: flex;
+    position: relative;
+    background-color: aquamarine;
+    border-style: ridge;
+}
+
+.charImageHolder {
+    display: flex;
+}
+
+.charDescriptionHolder {
+    display: flex;
+    padding-left: 10px;
+    flex-direction: column;
+    justify-content: space-evenly;
+    min-width: 200px;
+    font-family: fantasy;
+}
+
+.detailCharDisplay {
+    display: flex;
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    z-index: 1;
+    font-family: fantasy;
+    font-size: xx-large;
+    background-color: bisque;
+}
+
+.dataHolder{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.charDetailDescription{
+    display: flex;
+    align-items: center;
+}
+
+#itemsOnPageId {
+    width: 40px;
+    text-align: center;
+}

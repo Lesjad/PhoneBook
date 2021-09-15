@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>PhoneBook client</title>
+    <script src="./script.js"></script>
+    <link id="baseStyleId" rel="stylesheet" href="./style-row.css">
+    <link id="secStyleId" rel="stylesheet" href="">
+</head>
+
+<body>
+    <div class="header">
+        <h1>Phone book - client application</h1>
+    </div>
+
+    <div class="userDashboard">
+        <hr>
+        <h2 class="header">Activ user selection</h2>
+        <section id="userData">
+            <label for="selectUser">Aactiv user login: </label>
+            <select id="selectUser">
+                <option value=""></option>
+            </select>
+            <label for="passwordActivUser">password: </label>
+            <input type="password">
+            <button onclick="displayContacts()">CHOOSE USER</button>
+        </section>
+        
+        <hr>
+        <h2 class="header">Available users display</h2>
+        <section id="usersDataBase">
+            <div id="usersListContainer">
+                <table id="usersList">
+                </table>
+            </div>    
+        </section>
+
+        <hr>
+        <h2 class="header">ADD NEW USER</h2>
+        <section id="addNewUser">
+            <form id="formAddNewUser">
+                <label for="formAddNewUser-name">name: </label>
+                <input id="formAddNewUser-name" type="text" name="userName">
+                <br>
+        
+                <label for="formAddNewUser-login">login: </label>
+                <input id="formAddNewUser-login" type="text" name="login">
+                <br>
+        
+                <label for="formAddNewUser-password">password: </label>
+                <input id="formAddNewUser-password" type="text" name="password">
+                <br>
+
+                <button id="buttonAddUser">ADD NEW USER</button>
+            </form>
+        </section>
+
+        <hr>
+        <section>
+        <h2 class="header">Add contact to activ user</h2>
+            <form id="formAddNewContact">
+                <label for="name">name: </label>
+                <input id="name" type="text" name="name">
+                <br>
+        
+                <label for="surname">surname: </label>
+                <input id="surname" type="text" name="surname">
+                <br>
+        
+                <label for="phone-home">Home phone: </label>
+                <input id="phone-home" type="text" name="phoneHome">
+                <br>
+        
+                <label for="phone-work">Work phone: </label>
+                <input id="phone-work" type="text" name="phoneWork">
+                <br>
+        
+                <label for="email">email: </label>
+                <input id="email" type="text" name="email">
+                <br>
+        
+                <label for="photo">photo: </label>
+                <input id="photo" type="text" name="photo">
+                <br>
+                <button>SUBMIT</button>
+            </form>
+        </section>
+        <hr>
+    </div>
+
+    <div class="charsDisplay">
+        <div class="charsDisplayInfo">List of <div class="charsDisplayInfo" id="charsNumber"> </div> contacts</div>
+
+        <div class="dislayOptionsBar">
+
+            <section id="sortSection">
+                <label for="sortType">sort by: </label>
+                <select id="sortType">
+                    <option value="byId">ID</option>
+                    <option value="byName">name</option>
+                    <option value="byDate">date of creation</option>
+                </select>
+            </section>
+
+            <button id="dispChangeButton">change display</button>
+
+            <br>
+            <label for="itemsOnPageId">single page up to: </label>
+            <input id="itemsOnPageId" type="text" value="">
+            <label for="itemsOnPageId">contacts</label>
+            
+            <section id="navigationBar">
+                <hr>
+                <label for="navigationBar">filters: </label>
+                <input id="nameFilter" type="text" placeholder="nazwa postaci">
+
+                <div class="pagesInfo">
+                    <button class="pageNav" id="prevPageButtonId"><</button>
+                    <input type="text" id="page" value="">
+                    <button class="pageNav" id="nextPageButtonId">></button>
+                    <label id="pageId" for="page"></label>
+                </div>
+            </section>
+        </div>
+        <div class="charListContainer" id="idCharListContainer">
+        </div>
+    </div>
+    <!-- <div id="testDiv">jakis content</div> -->
+</body>
+
+</html>
