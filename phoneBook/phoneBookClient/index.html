@@ -15,7 +15,7 @@
 
     <div class="userDashboard">
         <hr>
-        <h2 class="header">primitive login section :)</h2>
+        <h2 class="header">Custom authentication form</h2>
         <form id="id-form-Authentication">
             <label for="id-select-Authentication-Login">login: </label>
             <select id="id-select-Authentication-Login" name="login">
@@ -35,7 +35,7 @@
         </section>
 
         <hr>
-        <h2 class="header">ADD NEW USER</h2>
+        <h2 class="header">REGISTER USER form</h2>
         <section id="id-section-AddNewUser">
             <form id="id-form-AddNewUser">
                 <label for="id-input-AddNewUser-name">name: </label>
@@ -56,7 +56,7 @@
 
         <hr>
         <section>
-        <h2 class="header">Add contact to activ user</h2>
+        <h2 class="header">CONTACT administration form</h2>
             <form id="id-form-AddNewContact">
                 <label for="id-input-AddNewContact-name">name: </label>
                 <input id="id-input-AddNewContact-name" type="text" name="name">
@@ -83,7 +83,7 @@
                 <br>
                 <button id="id-button-AddContact">ADD CONTACT</button>
                 <button id="id-button-DeleteContact">DELETE CONTACT</button>
-                
+                <button id="id-button-SearchForContact">SEARCH FOR CONTACT</button>
                 <br>
                 <label for="id-input-FormContact-oldName">name of contact to be changed: </label>
                 <input id="id-input-FormContact-oldName" type="text">
@@ -95,7 +95,8 @@
 
     <div class="charsDisplay">
         <div class="charsDisplayInfo">List of <div class="charsDisplayInfo" id="charsNumber"> </div> contacts</div>
-        <table id="id-table-Contacts"></table>
+        <br>
+        <button id="id-button-RefreshContactList">SHOW COMPLETE USER CONTACT LIST</button>
         <div class="dislayOptionsBar">
             <section id="id-section-Sort">
                 <label for="id-select-SortType">sort by: </label>
@@ -124,6 +125,7 @@
                     </div>
                 </section>
             </section>
+            <table id="id-table-Contacts"></table>
         </div>
         <div class="charListContainer" id="idCharListContainer">
         </div>

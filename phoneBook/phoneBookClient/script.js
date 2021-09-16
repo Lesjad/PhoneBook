@@ -7,6 +7,7 @@ const endpoint_GetUserContacts = "api/get-contacts/";
 const endpoint_AddContact = "api/add-contact-to-user/";
 const endpoint_DeleteContact = "api/delete-contact?";
 const endpoint_UpdateContact = "api/update-contact/";
+const endpoint_GetContact = "api/search-for-contact/";
 
 //id's of used DOM elements
 const idForm_NewUser = "id-form-AddNewUser";
@@ -27,6 +28,9 @@ const idButton_DeleteContact = "id-button-DeleteContact";
 const idButton_AddContact = "id-button-AddContact";
 const idButton_UpdateContact = "id-button-UpdateContact";
 const idInput_UpdateContact_OldName = "id-input-FormContact-oldName";
+const idButton_RefreshContactList = "id-button-RefreshContactList";
+const idTable_Contacts = "id-table-Contacts";
+const idButton_SearchContact = "id-button-SearchForContact";
 
 
 //DOM elements. assignment to variables done when DOMContentLoaded
@@ -47,9 +51,11 @@ var button_DeleteContact;
 var button_AddContact;
 var button_UpdateContact;
 var input_UpdateContact_OldName;
+var button_RefreshContactList;
+var table_Contacts;
+var button_SearchContact;
 
-var charactersArray, 
-indexStartDisp = 0, 
+var indexStartDisp = 0, 
 dispRange = 30;
 
 //Setting up the "environment" when the page is loaded
@@ -75,6 +81,9 @@ document.addEventListener('DOMContentLoaded', function(){
     button_AddContact = document.getElementById(idButton_AddContact);
     button_UpdateContact = document.getElementById(idButton_UpdateContact);
     input_UpdateContact_OldName = document.getElementById(idInput_UpdateContact_OldName);
+    button_RefreshContactList = document.getElementById(idButton_RefreshContactList);
+    table_Contacts = document.getElementById(idTable_Contacts);
+    button_SearchContact = document.getElementById(idButton_SearchContact);
 
     //form's handling section
     formUser.onsubmit = function(e) {
@@ -106,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function(){
     //seeting up initial styles
     section_Sort.style.display = "none";
     section_NavigationBar.style.display = "none";
+    document.getElementById("id-section-Filter").style.display = "none";
 
     //adding event handlers
     input_NumOfDisplayedContacts.addEventListener("change", setItemsOnPage);
@@ -117,9 +127,11 @@ document.addEventListener('DOMContentLoaded', function(){
     button_DeleteContact.addEventListener("click", deleteContact);
     button_AddContact.addEventListener("click", createNewContact);
     button_UpdateContact.addEventListener("click", updateContact);
+    button_RefreshContactList.addEventListener("click", displayContacts);
+    button_SearchContact.addEventListener("click", searchContact);
 
     //invoke initial functions
-    displayUsers(endpoint_GetUsers);
+    displayUsers(baseUrl + endpoint_GetUsers);
 
 }, false);
 
@@ -156,6 +168,56 @@ function displayUsers(url){
     })
 }
 
+function fillContactsTable(jsnObj){
+
+    if (jsnObj.length) {
+        let keys = Object.keys(jsnObj[0])
+        //TODO: create table headers
+        table_Contacts.innerHTML="";
+        let tHeader = document.createElement("thead");
+        keys.forEach(key => {
+            let th = document.createElement('th');
+            th.innerHTML = key;
+            tHeader.appendChild(th);
+        });
+        table_Contacts.innerHTML="";
+        table_Contacts.appendChild(tHeader);
+        
+        jsnObj.forEach(contact => {
+            let tr = document.createElement('tr');
+            keys.forEach(key => {
+                let td = document.createElement('td');
+                td.innerHTML = contact[key];
+                tr.appendChild(td);
+            })
+            table_Contacts.appendChild(tr);
+        });
+    } else {
+        table_Contacts.innerHTML = "AUTHENTICATION FAILED OR \nTHERE IS NO CONTACT IN THE DATABASE THAT MEETS THE QUERY";
+    }
+}
+
+async function displayContacts(){
+    console.info("displayContacts() invoked");
+
+    fetchQuery(baseUrl+endpoint_GetUserContacts).then(resolved => {
+        fillContactsTable(resolved);
+    }, rejected => {
+        fillContactsTable(null);
+    });
+}
+
+async function searchContact(){
+    console.info("searchContact() invoked");
+    let url = new URL(baseUrl+endpoint_GetContact);
+    let params = collectNonNullData(formContact);
+
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+    fetchQuery(url).then(resolved => {
+        fillContactsTable(resolved);
+    });
+}
 function logIn(){
     console.info("logIn() invoked");
 
@@ -195,12 +257,25 @@ function collectData(formId){
     return data;
 }
 
+function collectNonNullData(form){
+    console.info("collectNonNullData() invoked");
+
+    var data = {};
+    for (var i = 0; i<form.length; i++){
+        var input = form[i];
+        if (input.name && input.value) {
+            data[input.name] = input.value;
+        }
+    }
+    return data;
+}
+
 function createNewUser(){
     console.info("createNewUser() invoked");
 
     var jsonObj = JSON.stringify(collectData(idForm_NewUser));
     postData(baseUrl+endpoint_SaveUser, jsonObj);
-    displayUsers(endpoint_GetUsers);
+    displayUsers(baseUrl+endpoint_GetUsers);
 }
 
 function createNewContact(){
@@ -258,6 +333,8 @@ function getData(url, jsnoObj){
             }
         }};
     xhr.send(jsnoObj);
+
+    return json;
 }
 
 function postData(url, jsnoObj){
@@ -337,58 +414,12 @@ function setItemsOnPage(){
     dispNavigationData();
 }
 
-//TODO: checkup if that function is useful in the task
-//returns the Array of characters with endpoint "userQuery"
-async function arrWithChars(oldCharactersArray, userQuery) {
-    console.info("arrWithChars() invoked");
-
-    let dispReady = false,
-    myObject,
-    newCharactersArray=[];
-
-    try {
-        do {
-            myObject = await fetchQuery(userQuery)
-            if (myObject.results) {
-                newCharactersArray = newCharactersArray.concat(myObject.results);
-            }
-            try {
-                userQuery = myObject.info.next;
-            } catch (error) {
-                window.alert("Brak postaci do wyświetlenia\nSerwer nie odpowieada lub Zmień filtry");
-
-                oldCharactersArray=oldCharactersArray.concat(newCharactersArray);
-                newCharactersArray=[];
-                displayCards(oldCharactersArray, indexStartDisp, dispRange);
-                dispReady = true;
-                break;
-            }
-            if (!dispReady && (userQuery === null || ((oldCharactersArray.length+newCharactersArray.length) >= (indexStartDisp + dispRange)))) {
-                oldCharactersArray=oldCharactersArray.concat(newCharactersArray);
-                newCharactersArray=[];
-                displayCards(oldCharactersArray, indexStartDisp, dispRange);
-                dispReady = true;
-            }
-        } while (userQuery != null)
-    } catch (error) {
-        window.alert(error);
-        console.log(error);
-        displayCards(oldCharactersArray, indexStartDisp, dispRange);
-    }
-    return oldCharactersArray.concat(newCharactersArray);
-}
-
 async function fetchQuery(query) {
     let myResponse, myObject;
+    let headers = {"headers" : new Headers({'content-type' : 'application/json', 'login' : getActivUser(), 'password' : input_AuthenticationPassword.value})}
 
-    if (query.includes(baseUrl)) {
-        myResponse = await fetch(query);
-        console.log("fetching: " + query);
-
-    } else {
-        myResponse = await fetch(baseUrl + query);
-        console.log("fetching: " + baseUrl + query);
-    }
+    myResponse = await fetch(query, headers);
+    console.log("fetching: " + query);
     myObject = await myResponse.json();
 
     return myObject;

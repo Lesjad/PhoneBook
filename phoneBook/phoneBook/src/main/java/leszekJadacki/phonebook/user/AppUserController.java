@@ -5,15 +5,14 @@ import leszekJadacki.phonebook.contact.ContactController;
 import leszekJadacki.phonebook.user.role.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.websocket.server.PathParam;
 import java.net.URI;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "api")
@@ -62,6 +61,22 @@ public class AppUserController {
     }
 
     @CrossOrigin
+    @GetMapping(path = "search-for-contact")
+    public ResponseEntity<?> searchForContact(@RequestHeader(name = "login") String login,
+                                              @RequestHeader(name = "password") String password,
+                                              @RequestParam(name = "name", required = false) String name,
+                                              @RequestParam(name = "surname", required = false) String surname,
+                                              @RequestParam(name = "phoneHome", required = false) String phoneHome,
+                                              @RequestParam(name = "phoneWork", required = false) String phoneWork,
+                                              @RequestParam(name = "email", required = false) String email){
+        boolean passwordCorrect = userService.userAuthentication(login, password);
+        log.info("Authentication result: " + (passwordCorrect? "positive" : "negative"));
+
+        return passwordCorrect? ResponseEntity.ok().body(contactController
+                .filterContacts((List<Contact>)userService.getContactsOfUser(login), name, surname, phoneHome, phoneWork, email)) :
+                ResponseEntity.status(401).body("Authentication failed");
+    }
+    @CrossOrigin
     @GetMapping(path = "get-contacts")
     public ResponseEntity<?> getContactsOfUser(@RequestHeader(name = "login") String login,
                                                @RequestHeader(name = "password") String password){
@@ -100,11 +115,10 @@ public class AppUserController {
                                            @PathVariable(name = "contact-name") String oldName,
                                            @RequestBody Contact contact){
         Long userId = userService.getUser(userLogin).getId();
-        contactController.updateContact(
-                userId,
-                oldName,
-                contact);
-        return ResponseEntity.ok().body("success?");
+
+        return ResponseEntity.ok()
+                .body(contactController
+                        .updateContact(userId, oldName, contact));
     }
 
     @CrossOrigin
@@ -119,29 +133,19 @@ public class AppUserController {
         }
         List<Contact> contacts = (List<Contact>) userService.getUser(login).getContactList();
 
-        if (fName!=null && !fName.isBlank()){
-            contacts = contacts.stream()
-                    .filter(contact -> contact.getName().equals(fName))
-                    .collect(Collectors.toList());
-        }
-        if (lName!=null && !lName.isBlank()){
-            contacts = contacts.stream()
-                    .filter(contact -> contact.getSurname().equals(lName))
-                    .collect(Collectors.toList());
-        }
-        if (email!=null && !email.isBlank()){
-            contacts = contacts.stream()
-                    .filter(contact -> contact.getEmail().equals(email))
-                    .collect(Collectors.toList());
-        }
-
-        log.info("after filtration: " + contacts);
+        contacts = contactController
+                .filterContacts(contacts,
+                fName,
+                lName,
+                null,
+                null,
+                email,
+                null);
         if (contacts.size()==0)
             return ResponseEntity.notFound().build();
 
         if (contacts.size()>1)
             return ResponseEntity.badRequest().body(this.getClass().getSimpleName()+": found multiple contacts. Try more precise request");
 
-        return ResponseEntity.ok().body(contactController.deleteContact(contacts.get(0)));
-    }
+        return ResponseEntity.ok().body(contactController.deleteContact(contacts.get(0)));}
 }

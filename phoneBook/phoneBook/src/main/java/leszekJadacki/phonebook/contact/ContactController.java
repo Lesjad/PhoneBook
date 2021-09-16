@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -57,5 +58,23 @@ public class ContactController {
                 userId,
                 prevContactName,
                 contact);
+    }
+
+    public List<Contact> filterContacts(List<Contact> contacts,
+                                        String fName,
+                                        String lName,
+                                        String phoneHome,
+                                        String phoneWork,
+                                        String email,
+                                        String photo){
+        return contactService.filterContacts(contacts, fName, lName, phoneHome, phoneWork, email, photo);
+    }
+    public List<Contact> filterContacts(List<Contact> contacts,
+                                 String fName,
+                                 String lName,
+                                 String phoneHome,
+                                 String phoneWork,
+                                 String email){
+        return filterContacts(contacts, fName, lName, phoneHome, phoneWork, email, null);
     }
 }

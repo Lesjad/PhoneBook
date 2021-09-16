@@ -1,10 +1,12 @@
 package leszekJadacki.phonebook.contact;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class ContactService {
@@ -87,5 +89,45 @@ public class ContactService {
 
         //TODO: further business logic to safely update contact
         return oldContact;
+    }
+
+    public List<Contact> filterContacts(List<Contact> contacts,
+                                        String fName,
+                                        String lName,
+                                        String phoneHome,
+                                        String phoneWork,
+                                        String email,
+                                        String photo) {
+        if (fName!=null && !fName.isBlank()){
+            contacts = contacts.stream()
+                    .filter(contact -> contact.getName().equals(fName))
+                    .collect(Collectors.toList());
+        }
+        if (lName!=null && !lName.isBlank()){
+            contacts = contacts.stream()
+                    .filter(contact -> contact.getSurname().equals(lName))
+                    .collect(Collectors.toList());
+        }
+        if (phoneHome!=null && !phoneHome.isBlank()){
+            contacts = contacts.stream()
+                    .filter(contact -> contact.getPhoneHome().equals(lName))
+                    .collect(Collectors.toList());
+        }
+        if (phoneWork!=null && !phoneWork.isBlank()){
+            contacts = contacts.stream()
+                    .filter(contact -> contact.getPhoneWork().equals(lName))
+                    .collect(Collectors.toList());
+        }
+        if (email!=null && !email.isBlank()){
+            contacts = contacts.stream()
+                    .filter(contact -> contact.getEmail().equals(email))
+                    .collect(Collectors.toList());
+        }
+        if (photo!=null && !photo.isBlank()){
+            contacts = contacts.stream()
+                    .filter(contact -> contact.getPhoto().equals(lName))
+                    .collect(Collectors.toList());
+        }
+        return contacts;
     }
 }
