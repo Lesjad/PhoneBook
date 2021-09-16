@@ -2,6 +2,8 @@ package leszekJadacki.phonebook.user;
 
 import leszekJadacki.phonebook.contact.Contact;
 import leszekJadacki.phonebook.user.role.Role;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,7 +22,9 @@ public class AppUser {
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<Role> roles = new ArrayList<>();
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "AppUser_id")
     private Collection<Contact> contactList = new ArrayList<>();
 
     public AppUser() {
@@ -105,9 +109,10 @@ public class AppUser {
     public String toString() {
         return "AppUser{"+
                 "id='"+id+'\''+
-                "login='"+ userName +'\''+
+                "userName='"+ userName+ '\''+
+                "login='"+ login +'\''+
                 "password='"+password+'\''+
-                "roles='"+this.roles+'\''+
+                "roles='"+roles+'\''+
                 "}";
     }
 }

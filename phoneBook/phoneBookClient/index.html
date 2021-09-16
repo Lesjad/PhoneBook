@@ -5,8 +5,7 @@
     <meta charset="utf-8" />
     <title>PhoneBook client</title>
     <script src="./script.js"></script>
-    <link id="baseStyleId" rel="stylesheet" href="./style-row.css">
-    <link id="secStyleId" rel="stylesheet" href="">
+    <link id="id-baseStyle" rel="stylesheet" href="./style-row.css">
 </head>
 
 <body>
@@ -16,74 +15,79 @@
 
     <div class="userDashboard">
         <hr>
-        <h2 class="header">Activ user selection</h2>
-        <section id="userData">
-            <label for="selectUser">Aactiv user login: </label>
-            <select id="selectUser">
+        <h2 class="header">primitive login section :)</h2>
+        <form id="id-form-Authentication">
+            <label for="id-select-Authentication-Login">login: </label>
+            <select id="id-select-Authentication-Login" name="login">
                 <option value=""></option>
             </select>
-            <label for="passwordActivUser">password: </label>
-            <input type="password">
-            <button onclick="displayContacts()">CHOOSE USER</button>
-        </section>
+            <br>
+            <label for="id-input-Authentication-Password">password: </label>
+            <input id="id-input-Authentication-Password" type="password" name="password">
+            <button>Log In</button>
+        </form>
         
         <hr>
         <h2 class="header">Available users display</h2>
-        <section id="usersDataBase">
-            <div id="usersListContainer">
-                <table id="usersList">
+        <section id="id-section-UsersDataBase">
+                <table id="id-table-UsersList">
                 </table>
-            </div>    
         </section>
 
         <hr>
         <h2 class="header">ADD NEW USER</h2>
-        <section id="addNewUser">
-            <form id="formAddNewUser">
-                <label for="formAddNewUser-name">name: </label>
-                <input id="formAddNewUser-name" type="text" name="userName">
+        <section id="id-section-AddNewUser">
+            <form id="id-form-AddNewUser">
+                <label for="id-input-AddNewUser-name">name: </label>
+                <input id="id-input-AddNewUser-name" type="text" name="userName">
                 <br>
         
-                <label for="formAddNewUser-login">login: </label>
-                <input id="formAddNewUser-login" type="text" name="login">
+                <label for="id-input-AddNewUser-login">login: </label>
+                <input id="id-input-AddNewUser-login" type="text" name="login">
                 <br>
         
-                <label for="formAddNewUser-password">password: </label>
-                <input id="formAddNewUser-password" type="text" name="password">
+                <label for="id-input-AddNewUser-password">password: </label>
+                <input id="id-input-AddNewUser-password" type="password" name="password">
                 <br>
 
-                <button id="buttonAddUser">ADD NEW USER</button>
+                <button id="id-button-AddUser">ADD NEW USER</button>
             </form>
         </section>
 
         <hr>
         <section>
         <h2 class="header">Add contact to activ user</h2>
-            <form id="formAddNewContact">
-                <label for="name">name: </label>
-                <input id="name" type="text" name="name">
+            <form id="id-form-AddNewContact">
+                <label for="id-input-AddNewContact-name">name: </label>
+                <input id="id-input-AddNewContact-name" type="text" name="name">
                 <br>
         
-                <label for="surname">surname: </label>
-                <input id="surname" type="text" name="surname">
+                <label for="id-input-AddNewContact-surname">surname: </label>
+                <input id="id-input-AddNewContact-surname" type="text" name="surname">
                 <br>
         
-                <label for="phone-home">Home phone: </label>
-                <input id="phone-home" type="text" name="phoneHome">
+                <label for="id-input-AddNewContact-phoneHome">Home phone: </label>
+                <input id="id-input-AddNewContact-phoneHome" type="text" name="phoneHome">
                 <br>
         
-                <label for="phone-work">Work phone: </label>
-                <input id="phone-work" type="text" name="phoneWork">
+                <label for="id-input-AddNewContact-phoneWork">Work phone: </label>
+                <input id="id-input-AddNewContact-phoneWork" type="text" name="phoneWork">
                 <br>
         
-                <label for="email">email: </label>
-                <input id="email" type="text" name="email">
+                <label for="id-input-AddNewContact-email">email: </label>
+                <input id="id-input-AddNewContact-email" type="text" name="email">
                 <br>
         
-                <label for="photo">photo: </label>
-                <input id="photo" type="text" name="photo">
+                <label for="id-input-AddNewContact-photo">photo: </label>
+                <input id="id-input-AddNewContact-photo" type="text" name="photo">
                 <br>
-                <button>SUBMIT</button>
+                <button id="id-button-AddContact">ADD CONTACT</button>
+                <button id="id-button-DeleteContact">DELETE CONTACT</button>
+                
+                <br>
+                <label for="id-input-FormContact-oldName">name of contact to be changed: </label>
+                <input id="id-input-FormContact-oldName" type="text">
+                <button id="id-button-UpdateContact">UPDATE CONTACT</button>
             </form>
         </section>
         <hr>
@@ -91,36 +95,34 @@
 
     <div class="charsDisplay">
         <div class="charsDisplayInfo">List of <div class="charsDisplayInfo" id="charsNumber"> </div> contacts</div>
-
+        <table id="id-table-Contacts"></table>
         <div class="dislayOptionsBar">
-
-            <section id="sortSection">
-                <label for="sortType">sort by: </label>
-                <select id="sortType">
+            <section id="id-section-Sort">
+                <label for="id-select-SortType">sort by: </label>
+                <select id="id-select-SortType">
                     <option value="byId">ID</option>
                     <option value="byName">name</option>
-                    <option value="byDate">date of creation</option>
                 </select>
             </section>
-
-            <button id="dispChangeButton">change display</button>
+            <section id="id-section-Filter">
+                <label for="id-input-NameFilter">filter contacts by name: </label>
+                <input id="id-input-NameFilter" type="text" placeholder="name of contact">
+            </section>
 
             <br>
-            <label for="itemsOnPageId">single page up to: </label>
-            <input id="itemsOnPageId" type="text" value="">
-            <label for="itemsOnPageId">contacts</label>
-            
-            <section id="navigationBar">
-                <hr>
-                <label for="navigationBar">filters: </label>
-                <input id="nameFilter" type="text" placeholder="nazwa postaci">
+            <section id="id-section-NavigationBar">
+                <section id="id-section-Pagination">
+                    <label for="id-input-ItemsOnPageId">single page up to: </label>
+                    <input id="id-input-ItemsOnPageId" type="text" value="">
+                    <label for="id-input-ItemsOnPageId">contacts</label>
 
-                <div class="pagesInfo">
-                    <button class="pageNav" id="prevPageButtonId"><</button>
-                    <input type="text" id="page" value="">
-                    <button class="pageNav" id="nextPageButtonId">></button>
-                    <label id="pageId" for="page"></label>
-                </div>
+                    <div class="pagesInfo">
+                        <button class="pageNav" id="id-button-PrevPage"><</button>
+                        <input type="text" id="id-input-Page" value="">
+                        <button class="pageNav" id="id-button-NextPage">></button>
+                        <label id="pageId" for="id-input-Page"></label>
+                    </div>
+                </section>
             </section>
         </div>
         <div class="charListContainer" id="idCharListContainer">

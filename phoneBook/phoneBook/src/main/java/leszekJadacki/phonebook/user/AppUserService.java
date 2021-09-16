@@ -99,6 +99,11 @@ public class AppUserService {
         return user;
     }
 
+    public boolean userAuthentication(String login, String password){
+        AppUser user = userRepository.findByLogin(login).orElseThrow(() -> new NoSuchElementException("User not found"));
+        return user.getPassword().equals(password);
+    }
+
     @Transactional
     public void updateContactData(String userLogin, Contact oldContact, Contact newContact) {
         AppUser user = userRepository.findByLogin(userLogin).orElseThrow(() -> new NoSuchElementException("user not found"));

@@ -1,7 +1,9 @@
 package leszekJadacki.phonebook.contact;
 
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -9,8 +11,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.logging.Logger;
 
-@RestController
-@RequestMapping(path = "api")
+@Controller
 public class ContactController {
 
     private final ContactService contactService;
@@ -21,7 +22,6 @@ public class ContactController {
         this.contactService = contactService;
     }
 
-    @PostMapping(path = "create-contact")
     public Contact createContact(@RequestParam(name = "name") String name,
                                    @RequestParam(name = "surname") String surname,
                                    @RequestParam(name = "phoneHome") String phoneHome,
@@ -37,12 +37,25 @@ public class ContactController {
         return ResponseEntity.created(uri).body(contactService.addContact(contact));
     }
 
-    @GetMapping(path = "get-contacts")
     public List<Contact> getContacts() {
         return contactService.getContacts();
     }
 
     public boolean validate(Contact contact) {
         return contactService.validate(contact);
+    }
+
+    public ResponseEntity<?> deleteContact(Contact contact) {
+        return ResponseEntity.ok().body(contactService.delete(contact));
+    }
+
+    public Contact updateContact(
+            Long userId,
+            String prevContactName,
+            Contact contact) {
+        return contactService.updateContact(
+                userId,
+                prevContactName,
+                contact);
     }
 }
