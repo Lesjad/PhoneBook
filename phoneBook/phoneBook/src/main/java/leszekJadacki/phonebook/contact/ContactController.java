@@ -1,6 +1,5 @@
 package leszekJadacki.phonebook.contact;
 
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -8,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -50,16 +48,6 @@ public class ContactController {
         return ResponseEntity.ok().body(contactService.delete(contact));
     }
 
-    public Contact updateContact(
-            Long userId,
-            String prevContactName,
-            Contact contact) {
-        return contactService.updateContact(
-                userId,
-                prevContactName,
-                contact);
-    }
-
     public List<Contact> filterContacts(List<Contact> contacts,
                                         String fName,
                                         String lName,
@@ -76,5 +64,9 @@ public class ContactController {
                                  String phoneWork,
                                  String email){
         return filterContacts(contacts, fName, lName, phoneHome, phoneWork, email, null);
+    }
+
+    public Contact updateContact(List<Contact> contacts, String name, String surname, String phoneHome, String phoneWork, String email, Contact contact) {
+        return contactService.updateContact(filterContacts(contacts, name, surname, phoneHome, phoneWork, email), contact);
     }
 }

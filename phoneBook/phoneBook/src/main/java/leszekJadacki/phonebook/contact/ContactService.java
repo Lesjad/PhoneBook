@@ -1,9 +1,9 @@
 package leszekJadacki.phonebook.contact;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.NonUniqueResultException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -68,11 +68,16 @@ public class ContactService {
         return "Success";
     }
 
-    public Contact updateContact(Long userId,
-                                 String prevContactName,
+    public Contact updateContact(List<Contact> contacts,
                                  Contact contact){
-        Contact oldContact = contactRepository.findByNameAndUser(prevContactName, userId)
-                .orElseThrow(() -> new NoSuchElementException("could not find contact by given name -" + prevContactName));
+        Contact oldContact;
+        if (contacts.size() > 1) {
+            throw new NonUniqueResultException("found more than one contact match for change");
+        } else if (contacts.size() == 0){
+            throw new NoSuchElementException("Could not find contact pointed for update");
+        } else {
+            oldContact = contacts.get(0);
+        }
 
         if (contact.getName()!=null && !contact.getName().equals(oldContact.getName()) && !contact.getName().isBlank())
             oldContact.setName(contact.getName());
@@ -87,7 +92,7 @@ public class ContactService {
         if (contact.getPhoto()!=null && !contact.getPhoto().equals(oldContact.getPhoto()) && !contact.getPhoto().isBlank())
             oldContact.setPhoto(contact.getPhoto());
 
-        //TODO: further business logic to safely update contact
+        //TODO: further business logic to safely update contact (for instance if name already exists)
         return oldContact;
     }
 

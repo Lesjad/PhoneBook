@@ -9,6 +9,11 @@ const endpoint_DeleteContact = "api/delete-contact?";
 const endpoint_UpdateContact = "api/update-contact/";
 const endpoint_GetContact = "api/search-for-contact/";
 
+const METHOD_GET = "GET";
+const METHOD_PUT = "PUT";
+const METHOD_DELETE = "DELETE";
+const METHOD_POST = "POST";
+
 //id's of used DOM elements
 const idForm_NewUser = "id-form-AddNewUser";
 const idForm_Contact = "id-form-AddNewContact";
@@ -20,7 +25,7 @@ const idTable_Users = 'id-table-UsersList';
 const idButton_NextPage = "id-button-NextPage";
 const idButton_PrevPage = "id-button-PrevPage";
 const idInput_Page = "id-input-Page";
-const idSelect_SortType= "id-select-SortType";
+const idSelect_SortType = "id-select-SortType";
 const idInput_NameFilter = "id-input-NameFilter";
 const idSection_Sort = "id-section-Sort";
 const idSection_NavigationBar = "id-section-NavigationBar";
@@ -35,9 +40,9 @@ const idButton_SearchContact = "id-button-SearchForContact";
 
 //DOM elements. assignment to variables done when DOMContentLoaded
 var input_NumOfDisplayedContacts;
-var formUser;
-var formContact;
-var formAuthentication;
+var form_NewUser;
+var form_NewContact;
+var form_Authentication;
 var input_AuthenticationPassword;
 var select_AuthenticationLogin;
 var table_Users;
@@ -55,18 +60,18 @@ var button_RefreshContactList;
 var table_Contacts;
 var button_SearchContact;
 
-var indexStartDisp = 0, 
-dispRange = 30;
+var indexStartDisp = 0,
+    dispRange = 30;
 
 //Setting up the "environment" when the page is loaded
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', function () {
     console.log("DOMContentLoaded...");
 
     //assigning DOM elements to variables
     input_NumOfDisplayedContacts = document.getElementById(idInput_ItemsOnPage);
-    formUser = document.getElementById(idForm_NewUser);
-    formContact = document.getElementById(idForm_Contact);
-    formAuthentication = document.getElementById(idForm_Authentication);
+    form_NewUser = document.getElementById(idForm_NewUser);
+    form_NewContact = document.getElementById(idForm_Contact);
+    form_Authentication = document.getElementById(idForm_Authentication);
     input_AuthenticationPassword = document.getElementById(idInput_AuthenticationPassword);
     select_AuthenticationLogin = document.getElementById(idSelect_AuthenticationLogin);
     table_Users = document.getElementById(idTable_Users);
@@ -86,16 +91,16 @@ document.addEventListener('DOMContentLoaded', function(){
     button_SearchContact = document.getElementById(idButton_SearchContact);
 
     //form's handling section
-    formUser.onsubmit = function(e) {
+    form_NewUser.onsubmit = function (e) {
         e.preventDefault();
         createNewUser();
     }
 
-    formContact.onsubmit = function(e) {
+    form_NewContact.onsubmit = function (e) {
         e.preventDefault();
     }
 
-    formAuthentication.onsubmit = function(e){
+    form_Authentication.onsubmit = function (e) {
         e.preventDefault();
         logIn();
     }
@@ -104,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function(){
     setInputFilter(input_Page, function (value) {
         return /^[0-9]+$|^$/.test(value); // Allow digits only, using a RegExp
     });
-    
+
     setInputFilter(input_NumOfDisplayedContacts, function (value) {
         return /^[0-9]+$|^$/.test(value); // Allow digits only, using a RegExp
     });
@@ -136,53 +141,53 @@ document.addEventListener('DOMContentLoaded', function(){
 }, false);
 
 
-function displayUsers(url){
+function displayUsers() {
     console.info("displayUsers() invoked");
 
-    fetchQuery(url).then(function(resolved){
-        var users=resolved;
-        console.log(users);
+    let url = new URL(baseUrl + endpoint_GetUsers);
+
+    fetchQuery(url).then(function (resolved) {
+        var users = resolved;
         var option = document.createElement('option');
         var tHead = document.createElement('thead');
 
-        select_AuthenticationLogin.innerHTML="";
+        select_AuthenticationLogin.innerHTML = "";
         option.innerHTML = "";
-        table_Users.innerHTML="";
-        tHead.innerHTML= '<th>User name</th>' +
-        '<th>Login</th>';  
+        table_Users.innerHTML = "";
+        tHead.innerHTML = '<th>User name</th>' +
+            '<th>Login</th>';
 
         select_AuthenticationLogin.appendChild(option);
         table_Users.appendChild(tHead);
-        
+
         users.forEach(user => {
             var option = document.createElement('option');
             option.innerHTML = user.login;
             option.value = user.login;
             select_AuthenticationLogin.appendChild(option);
-    
+
             var tr = document.createElement('tr');
-            tr.innerHTML='<td>' + user.userName + '</td>' +
-            '<td>' + user.login + '</td>';
+            tr.innerHTML = '<td>' + user.userName + '</td>' +
+                '<td>' + user.login + '</td>';
             table_Users.appendChild(tr);
         });
     })
 }
 
-function fillContactsTable(jsnObj){
+function fillContactsTable(jsnObj) {
 
     if (jsnObj.length) {
         let keys = Object.keys(jsnObj[0])
-        //TODO: create table headers
-        table_Contacts.innerHTML="";
+        table_Contacts.innerHTML = "";
         let tHeader = document.createElement("thead");
         keys.forEach(key => {
             let th = document.createElement('th');
             th.innerHTML = key;
             tHeader.appendChild(th);
         });
-        table_Contacts.innerHTML="";
+        table_Contacts.innerHTML = "";
         table_Contacts.appendChild(tHeader);
-        
+
         jsnObj.forEach(contact => {
             let tr = document.createElement('tr');
             keys.forEach(key => {
@@ -193,62 +198,54 @@ function fillContactsTable(jsnObj){
             table_Contacts.appendChild(tr);
         });
     } else {
-        table_Contacts.innerHTML = "AUTHENTICATION FAILED OR \nTHERE IS NO CONTACT IN THE DATABASE THAT MEETS THE QUERY";
+        table_Contacts.innerHTML = "AUTHENTICATION FAILED OR THERE IS NO CONTACT IN THE DATABASE THAT MEETS THE QUERY";
     }
 }
 
-async function displayContacts(){
+function displayContacts() {
     console.info("displayContacts() invoked");
 
-    fetchQuery(baseUrl+endpoint_GetUserContacts).then(resolved => {
+    fetchQuery(baseUrl + endpoint_GetUserContacts).then(resolved => {
         fillContactsTable(resolved);
     }, rejected => {
+        console.log("czy ja tu w ogóle docieram?");
         fillContactsTable(null);
     });
 }
 
-async function searchContact(){
+async function searchContact() {
     console.info("searchContact() invoked");
-    let url = new URL(baseUrl+endpoint_GetContact);
-    let params = collectNonNullData(formContact);
+    let url = new URL(baseUrl + endpoint_GetContact);
+    let params = mapNonNullData(form_NewContact);
 
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
     fetchQuery(url).then(resolved => {
         fillContactsTable(resolved);
+    }, reject => {
+        fillContactsTable(null);
     });
 }
-function logIn(){
-    console.info("logIn() invoked");
 
-    var activUserLogin = getActivUser();
-    let data = input_AuthenticationPassword.value;
-    let jsonObj = JSON.stringify(data);
-    console.log(jsonObj);
-    postData(baseUrl + endpoint_GetUserContacts+activUserLogin, jsonObj);
-    //TODO: actual display contact
+function logIn() {
+    console.info("logIn() invoked");
+    displayContacts();
 }
 
-function sortContacts(){
+function sortContacts() {
     console.info("sortContacts() invoked");
-
     //TODO: body of the function
 }
-function getActivUser(){
+function getActivUser() {
     console.info("getActivUser() invoked");
-    
     return select_AuthenticationLogin.value;
 }
 
-function collectData(formId){
-    console.info("collectData() invoked");
+function mapFormData(form) {
+    console.info("mapFormData() invoked");
 
     var data = {};
-    
-    var form = document.getElementById(formId);
-
-    console.info(form.length + " = form.length");
-    for (var i = 0; i<form.length; i++){
+    for (var i = 0; i < form.length; i++) {
         var input = form[i];
         if (input.name) {
             data[input.name] = input.value;
@@ -257,11 +254,11 @@ function collectData(formId){
     return data;
 }
 
-function collectNonNullData(form){
-    console.info("collectNonNullData() invoked");
+function mapNonNullData(form) {
+    console.info("mapNonNullData() invoked");
 
     var data = {};
-    for (var i = 0; i<form.length; i++){
+    for (var i = 0; i < form.length; i++) {
         var input = form[i];
         if (input.name && input.value) {
             data[input.name] = input.value;
@@ -270,50 +267,56 @@ function collectNonNullData(form){
     return data;
 }
 
-function createNewUser(){
+async function createNewUser() {
     console.info("createNewUser() invoked");
 
-    var jsonObj = JSON.stringify(collectData(idForm_NewUser));
-    postData(baseUrl+endpoint_SaveUser, jsonObj);
-    displayUsers(baseUrl+endpoint_GetUsers);
+    var jsonObj = JSON.stringify(mapFormData(form_NewUser));
+    postData(baseUrl + endpoint_SaveUser, jsonObj).then(resolved => {
+        console.log("createNewUser => then"); 
+        displayUsers(baseUrl + endpoint_GetUsers)});
 }
 
-function createNewContact(){
+function createNewContact() {
     console.info("createNewContact() invoked");
 
-    var jsonObj = JSON.stringify(collectData(idForm_Contact));
+    var jsonObj = JSON.stringify(mapFormData(form_NewContact));
     console.log(jsonObj);
-    postData(baseUrl + endpoint_AddContact, jsonObj);
+
+    fetchQuery(baseUrl+endpoint_AddContact, METHOD_POST, jsonObj).then(result => {
+        console.log(result);
+        displayContacts();
+    })
+    // postData(baseUrl + endpoint_AddContact, jsonObj).then( function (result) {
+    //     console.log(result);
+    //     displayContacts();
+    // }).catch(reject => {
+    //     console.log("reject: " + reject);
+    // });
 }
 
-function deleteContact(){
-    let query="";
-    for (let index = 0; index < formContact.length; index++) {
-        const element = formContact[index];
+function deleteContact() {
+    let query = "";
+    for (let index = 0; index < form_NewContact.length; index++) {
+        const element = form_NewContact[index];
         if (element.name && element.value) {
-            query+=element.name + "=" +element.value + "&&";
+            query += element.name + "=" + element.value + "&&";
         }
     }
     deleteData(baseUrl + endpoint_DeleteContact + query, null);
 }
 
-function updateContact(){
-    let query="";
+function updateContact() {
+    let query = new URL(baseUrl + endpoint_UpdateContact);
+    let method = "PUT";
+    let data = mapNonNullData(form_NewContact);
+    Object.keys(data).forEach(key => {
+        query.searchParams.append(key, data[key]);
+    });
 
-    let data = collectData(idForm_Contact);
-    let jsonObj = JSON.stringify(data);
-
-    for (let index = 0; index < formContact.length; index++) {
-        const element = formContact[index];
-        if (element.name && element.value) {
-            query+=element.name + "=" +element.value + "&&";
-        }
-    }
-
-    putData(baseUrl+endpoint_UpdateContact+ input_UpdateContact_OldName.value, jsonObj);
+    fetchQuery(query, method, requestBody);
 }
 
-function getData(url, jsnoObj){
+function getData(url, jsnoObj) {
     console.info("getData() invoked");
 
     // Sending and receiving data in JSON format using GET method
@@ -324,42 +327,50 @@ function getData(url, jsnoObj){
     xhr.setRequestHeader("password", input_AuthenticationPassword.value);
 
     xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4){
+        if (xhr.readyState === 4) {
             var json = JSON.parse(xhr.responseText);
-            if (xhr.status === 500){
+            if (xhr.status === 500) {
                 window.alert(json.message);
             } else if (xhr.status === 201) {
-            console.log(json);
+                console.log(json);
             }
-        }};
+        }
+    };
     xhr.send(jsnoObj);
 
     return json;
 }
 
-function postData(url, jsnoObj){
+async function postData(url, jsnoObj) {
     console.info("postData() invoked");
 
     // Sending and receiving data in JSON format using POST method
     var xhr = new XMLHttpRequest();
+    var json; //server respond
+
     xhr.open("POST", url, true);
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.setRequestHeader("login", select_AuthenticationLogin.value);
     xhr.setRequestHeader("password", input_AuthenticationPassword.value);
     xhr.onreadystatechange = function () {
-
-        if (xhr.readyState === 4){
-            var json = JSON.parse(xhr.responseText);
-            if (xhr.status === 500){
+        console.log("xhr.readyState: " + xhr.readyState);
+        if (xhr.readyState === 4) {
+            json = JSON.parse(xhr.responseText);
+            if (xhr.status === 500) {
                 window.alert(json.message);
             } else if (xhr.status === 201) {
-            console.log(json);
+                console.log(json);
             }
-        }};
+            if (xhr.status>210) {
+                console.log(xhr.status);
+                return Promise.reject("bo tak..")
+            }
+        }
+    };
     xhr.send(jsnoObj);
 }
 
-function deleteData(url, jsnoObj){
+function deleteData(url, jsnoObj) {
     console.info("deleteData() invoked");
 
     // Sending and receiving data in JSON format using GET method
@@ -370,18 +381,19 @@ function deleteData(url, jsnoObj){
     xhr.setRequestHeader("password", input_AuthenticationPassword.value);
 
     xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4){
+        if (xhr.readyState === 4) {
             var json = JSON.parse(xhr.responseText);
-            if (xhr.status === 500){
+            if (xhr.status === 500) {
                 window.alert(json.message);
             } else if (xhr.status === 201) {
-            console.log(json);
+                console.log(json);
             }
-        }};
+        }
+    };
     xhr.send(jsnoObj);
 }
 
-function putData(url, jsnoObj){
+function putData(url, jsnoObj) {
     console.info("putData() invoked");
 
     // Sending and receiving data in JSON format using GET method
@@ -392,34 +404,43 @@ function putData(url, jsnoObj){
     xhr.setRequestHeader("password", input_AuthenticationPassword.value);
 
     xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4){
+        if (xhr.readyState === 4) {
             var json = JSON.parse(xhr.responseText);
-            if (xhr.status === 500){
+            if (xhr.status === 500) {
                 window.alert(json.message);
             } else if (xhr.status === 201) {
-            console.log(json);
+                console.log(json);
             }
-        }};
+        }
+    };
     xhr.send(jsnoObj);
 }
 
 //setting up the limit of items on single page
-function setItemsOnPage(){    
+function setItemsOnPage() {
     console.log("setItemsOnPage() invoked.");
 
-    dispRange=Number(input_NumOfDisplayedContacts.value);
+    dispRange = Number(input_NumOfDisplayedContacts.value);
 
     //TODO: update following code
     displayCards(charactersArray, indexStartDisp, dispRange);
     dispNavigationData();
 }
 
-async function fetchQuery(query) {
+async function fetchQuery(query, method, body) {
     let myResponse, myObject;
-    let headers = {"headers" : new Headers({'content-type' : 'application/json', 'login' : getActivUser(), 'password' : input_AuthenticationPassword.value})}
+    let options = {
+        "method": method,
+        "headers": new Headers({
+            'content-type': 'application/json',
+            'login': getActivUser(),
+            'password': input_AuthenticationPassword.value
+        }),
+        "body": body
+    }
 
-    myResponse = await fetch(query, headers);
     console.log("fetching: " + query);
+    myResponse = await fetch(query, options);
     myObject = await myResponse.json();
 
     return myObject;
@@ -523,12 +544,12 @@ function displayCards(locCharactersArray, startIndex, range) {
 }
 
 //TODO: update function
-function dispNavigationData(){
+function dispNavigationData() {
     console.info("displayNavigationData() invoked");
 
     document.getElementById("charsNumber").innerHTML = charactersArray.length;
     document.getElementById('pageId').innerHTML =
-    "/" + Math.ceil(charactersArray.length / dispRange) + " stron";
+        "/" + Math.ceil(charactersArray.length / dispRange) + " stron";
 }
 
 //code taken from outsource (stackoverflow proposal)

@@ -94,19 +94,19 @@ public class AppUserService {
 
     public AppUser addContactToUser(AppUser user, Contact contact) {
         userRepository.findByLogin(user.getLogin())
-                .orElseThrow(() -> new NoSuchElementException("User not found"))
+                .orElseThrow(() -> new NoSuchElementException("Authentication failed. User not found"))
                 .getContactList().add(contact);
         return user;
     }
 
     public boolean userAuthentication(String login, String password){
-        AppUser user = userRepository.findByLogin(login).orElseThrow(() -> new NoSuchElementException("User not found"));
+        AppUser user = userRepository.findByLogin(login).orElseThrow(() -> new NoSuchElementException("Authentication failed. User not found"));
         return user.getPassword().equals(password);
     }
 
     @Transactional
     public void updateContactData(String userLogin, Contact oldContact, Contact newContact) {
-        AppUser user = userRepository.findByLogin(userLogin).orElseThrow(() -> new NoSuchElementException("user not found"));
+        AppUser user = userRepository.findByLogin(userLogin).orElseThrow(() -> new NoSuchElementException("Authentication failed. user not found"));
 
         if (user.getContactList().contains(oldContact)){
             user.getContactList().remove(oldContact);

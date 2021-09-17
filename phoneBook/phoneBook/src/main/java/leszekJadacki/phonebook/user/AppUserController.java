@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.websocket.server.PathParam;
 import java.net.URI;
 import java.util.List;
 import java.util.logging.Logger;
@@ -109,16 +108,20 @@ public class AppUserController {
 
     @CrossOrigin
     @Transactional
-    @PutMapping(path = "update-contact/{contact-name}")
+    @PutMapping(path = "update-contact")
     public ResponseEntity<?> updateContact(@RequestHeader(name = "login") String userLogin,
                                            @RequestHeader(name = "password") String password,
-                                           @PathVariable(name = "contact-name") String oldName,
+                                           @RequestParam(name = "name", required = false) String name,
+                                           @RequestParam(name = "surname", required = false) String surname,
+                                           @RequestParam(name = "phoneHome", required = false) String phoneHome,
+                                           @RequestParam(name = "phoneWork", required = false) String phoneWork,
+                                           @RequestParam(name = "email", required = false) String email,
                                            @RequestBody Contact contact){
-        Long userId = userService.getUser(userLogin).getId();
+        List<Contact> contacts = (List<Contact>) userService.getContactsOfUser(userLogin);
 
         return ResponseEntity.ok()
                 .body(contactController
-                        .updateContact(userId, oldName, contact));
+                        .updateContact(contacts, name, surname, phoneHome, phoneWork, email, contact));
     }
 
     @CrossOrigin
