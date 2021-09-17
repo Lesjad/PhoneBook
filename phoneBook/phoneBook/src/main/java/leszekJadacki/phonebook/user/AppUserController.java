@@ -117,11 +117,17 @@ public class AppUserController {
                                            @RequestParam(name = "phoneWork", required = false) String phoneWork,
                                            @RequestParam(name = "email", required = false) String email,
                                            @RequestBody Contact contact){
-        List<Contact> contacts = (List<Contact>) userService.getContactsOfUser(userLogin);
 
-        return ResponseEntity.ok()
-                .body(contactController
-                        .updateContact(contacts, name, surname, phoneHome, phoneWork, email, contact));
+        if (userService.userAuthentication(userLogin, password)) {
+            List<Contact> contacts = (List<Contact>) userService.getContactsOfUser(userLogin);
+
+            return ResponseEntity.ok()
+                    .body(contactController
+                            .updateContact(contacts, name, surname, phoneHome, phoneWork, email, contact));
+        }
+
+        return ResponseEntity.status(401).body(this.getClass().getSimpleName()+ "Authentication failed");
+
     }
 
     @CrossOrigin

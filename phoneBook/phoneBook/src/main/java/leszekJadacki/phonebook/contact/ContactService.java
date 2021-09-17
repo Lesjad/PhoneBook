@@ -69,31 +69,33 @@ public class ContactService {
     }
 
     public Contact updateContact(List<Contact> contacts,
-                                 Contact contact){
-        Contact oldContact;
+                                 Contact newContact){
+        Contact contact;
         if (contacts.size() > 1) {
             throw new NonUniqueResultException("found more than one contact match for change");
         } else if (contacts.size() == 0){
             throw new NoSuchElementException("Could not find contact pointed for update");
         } else {
-            oldContact = contacts.get(0);
+            contact = contacts.get(0);
         }
 
-        if (contact.getName()!=null && !contact.getName().equals(oldContact.getName()) && !contact.getName().isBlank())
-            oldContact.setName(contact.getName());
-        if (contact.getSurname()!=null && !contact.getSurname().equals(oldContact.getSurname()) && !contact.getSurname().isBlank())
-            oldContact.setSurname(contact.getSurname());
-        if (contact.getPhoneHome()!=null && !contact.getPhoneHome().equals(oldContact.getPhoneHome()) && !contact.getPhoneHome().isBlank())
-            oldContact.setPhoneHome(contact.getPhoneHome());
-        if (contact.getPhoneWork()!=null && !contact.getPhoneWork().equals(oldContact.getPhoneWork()) && !contact.getPhoneWork().isBlank())
-            oldContact.setPhoneWork(contact.getPhoneWork());
-        if (contact.getEmail()!=null && !contact.getEmail().equals(oldContact.getEmail()) && !contact.getEmail().isBlank())
-            oldContact.setEmail(contact.getEmail());
-        if (contact.getPhoto()!=null && !contact.getPhoto().equals(oldContact.getPhoto()) && !contact.getPhoto().isBlank())
-            oldContact.setPhoto(contact.getPhoto());
+        if (newContact.getName()!=null && !newContact.getName().equals(contact.getName()) && !newContact.getName().isBlank())
+            contact.setName(newContact.getName());
+        if (newContact.getSurname()!=null && !newContact.getSurname().equals(contact.getSurname()) && !newContact.getSurname().isBlank())
+            contact.setSurname(newContact.getSurname());
+        if (newContact.getPhoneHome()!=null && !newContact.getPhoneHome().equals(contact.getPhoneHome()) && !newContact.getPhoneHome().isBlank())
+            contact.setPhoneHome(newContact.getPhoneHome());
+        if (newContact.getPhoneWork()!=null && !newContact.getPhoneWork().equals(contact.getPhoneWork()) && !newContact.getPhoneWork().isBlank())
+            contact.setPhoneWork(newContact.getPhoneWork());
+        if (newContact.getEmail()!=null && !newContact.getEmail().equals(contact.getEmail()) && !newContact.getEmail().isBlank())
+            contact.setEmail(newContact.getEmail());
+        if (newContact.getPhoto()!=null && !newContact.getPhoto().equals(contact.getPhoto()) && !newContact.getPhoto().isBlank())
+            contact.setPhoto(newContact.getPhoto());
 
+        System.out.println("newContact: "+newContact);
+        System.out.println("return: " + contact);
         //TODO: further business logic to safely update contact (for instance if name already exists)
-        return oldContact;
+        return contact;
     }
 
     public List<Contact> filterContacts(List<Contact> contacts,

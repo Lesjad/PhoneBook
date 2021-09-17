@@ -85,8 +85,33 @@
                 <button id="id-button-DeleteContact">DELETE CONTACT</button>
                 <button id="id-button-SearchForContact">SEARCH FOR CONTACT</button>
                 <br>
-                <label for="id-input-FormContact-oldName">name of contact to be changed: </label>
-                <input id="id-input-FormContact-oldName" type="text">
+            </form>
+            <br>
+            <label for="id-input-OldContact">Data of "old" contact to be changed (none field is mandatory. For successfull update ensure that provided data is enough to identify unique contact): </label>
+            <form id="id-form-OldContact">
+                <label for="id-input-OldContact-name">name: </label>
+                <input id="id-input-OldContact-name" type="text" name="name">
+                <br>
+        
+                <label for="id-input-OldContact-surname">surname: </label>
+                <input id="id-input-OldContact-surname" type="text" name="surname">
+                <br>
+        
+                <label for="id-input-OldContact-phoneHome">Home phone: </label>
+                <input id="id-input-OldContact-phoneHome" type="text" name="phoneHome">
+                <br>
+        
+                <label for="id-input-OldContact-phoneWork">Work phone: </label>
+                <input id="id-input-OldContact-phoneWork" type="text" name="phoneWork">
+                <br>
+        
+                <label for="id-input-OldContact-email">email: </label>
+                <input id="id-input-OldContact-email" type="text" name="email">
+                <br>
+        
+                <label for="id-input-OldContact-photo">photo: </label>
+                <input id="id-input-OldContact-photo" type="text" name="photo">
+
                 <button id="id-button-UpdateContact">UPDATE CONTACT</button>
             </form>
         </section>

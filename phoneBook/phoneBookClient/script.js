@@ -16,8 +16,9 @@ const METHOD_POST = "POST";
 
 //id's of used DOM elements
 const idForm_NewUser = "id-form-AddNewUser";
-const idForm_Contact = "id-form-AddNewContact";
+const idForm_NewContact = "id-form-AddNewContact";
 const idForm_Authentication = "id-form-Authentication";
+const idForm_OldContact = "id-form-OldContact";
 const idInput_ItemsOnPage = "id-input-ItemsOnPageId";
 const idSelect_AuthenticationLogin = "id-select-Authentication-Login";
 const idInput_AuthenticationPassword = "id-input-Authentication-Password";
@@ -42,6 +43,7 @@ const idButton_SearchContact = "id-button-SearchForContact";
 var input_NumOfDisplayedContacts;
 var form_NewUser;
 var form_NewContact;
+var form_OldContact;
 var form_Authentication;
 var input_AuthenticationPassword;
 var select_AuthenticationLogin;
@@ -70,7 +72,8 @@ document.addEventListener('DOMContentLoaded', function () {
     //assigning DOM elements to variables
     input_NumOfDisplayedContacts = document.getElementById(idInput_ItemsOnPage);
     form_NewUser = document.getElementById(idForm_NewUser);
-    form_NewContact = document.getElementById(idForm_Contact);
+    form_NewContact = document.getElementById(idForm_NewContact);
+    form_OldContact = document.getElementById(idForm_OldContact);
     form_Authentication = document.getElementById(idForm_Authentication);
     input_AuthenticationPassword = document.getElementById(idInput_AuthenticationPassword);
     select_AuthenticationLogin = document.getElementById(idSelect_AuthenticationLogin);
@@ -97,6 +100,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     form_NewContact.onsubmit = function (e) {
+        e.preventDefault();
+    }
+
+    form_OldContact.onsubmit = function (e) {
         e.preventDefault();
     }
 
@@ -284,7 +291,11 @@ function createNewContact() {
 
     fetchQuery(baseUrl+endpoint_AddContact, METHOD_POST, jsonObj).then(result => {
         console.log(result);
-        displayContacts();
+        if (result["status"]>210) {
+            window.alert(result["message"])
+        } else {
+            displayContacts();
+        }
     })
     // postData(baseUrl + endpoint_AddContact, jsonObj).then( function (result) {
     //     console.log(result);
@@ -308,12 +319,15 @@ function deleteContact() {
 function updateContact() {
     let query = new URL(baseUrl + endpoint_UpdateContact);
     let method = "PUT";
-    let data = mapNonNullData(form_NewContact);
-    Object.keys(data).forEach(key => {
-        query.searchParams.append(key, data[key]);
+    let newContactData = mapNonNullData(form_NewContact);
+    let requestBody = JSON.stringify(newContactData);
+
+    let oldContactData = mapNonNullData(form_OldContact);
+    Object.keys(oldContactData).forEach(key => {
+        query.searchParams.append(key, oldContactData[key]);
     });
 
-    fetchQuery(query, method, requestBody);
+    fetchQuery(query, method, requestBody).then(() => displayContacts());
 }
 
 function getData(url, jsnoObj) {
