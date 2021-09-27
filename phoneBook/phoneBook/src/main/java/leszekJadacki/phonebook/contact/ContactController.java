@@ -44,8 +44,13 @@ public class ContactController {
         return contactService.validate(contact);
     }
 
-    public ResponseEntity<?> deleteContact(Contact contact) {
-        return ResponseEntity.ok().body(contactService.delete(contact));
+    public ResponseEntity<?> deleteContact(List<Contact> contacts,
+                                           String fName,
+                                           String lName,
+                                           String phoneHome,
+                                           String phoneWork,
+                                           String email) {
+        return ResponseEntity.ok().body(contactService.delete(contacts, fName, lName, phoneHome, phoneWork, email));
     }
 
     public List<Contact> filterContacts(List<Contact> contacts,

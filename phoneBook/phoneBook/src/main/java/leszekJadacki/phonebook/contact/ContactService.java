@@ -1,6 +1,7 @@
 package leszekJadacki.phonebook.contact;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.NonUniqueResultException;
@@ -63,9 +64,27 @@ public class ContactService {
         return true;
     }
 
-    public String delete(Contact contact) {
-        contactRepository.delete(contact);
-        return "Success";
+    public ResponseEntity<?> delete(List<Contact> contacts,
+                         String fName,
+                         String lName,
+                         String phoneHome,
+                         String phoneWork,
+                         String email) {
+        contacts = filterContacts(contacts,
+                        fName,
+                        lName,
+                        phoneHome,
+                        phoneWork,
+                        email,
+                        null);
+        if (contacts.size()==0)
+            return ResponseEntity.notFound().build();
+
+        if (contacts.size()>1)
+            return ResponseEntity.badRequest().body(this.getClass().getSimpleName()+": found multiple contacts. Try more precise request");
+
+        contactRepository.delete(contacts.get(0));
+        return ResponseEntity.ok().body("contact successfully deleted");
     }
 
     public Contact updateContact(List<Contact> contacts,

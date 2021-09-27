@@ -73,12 +73,16 @@ public class Contact {
 
     @Override
     public boolean equals(Object object) {
-        Contact obj = (Contact) object;
-        return (this.name.equals(obj.name) &&
-                this.surname.equals(obj.surname) &&
-                this.phoneHome.equals(obj.phoneHome) &&
-                this.phoneWork.equals(obj.phoneWork) &&
-                this.email.equals(obj.email));
+
+        Contact contact = object instanceof Contact ? ((Contact) object) : null;
+        if (contact!=null) {
+            return (this.name.equals(contact.name) &&
+                    this.surname.equals(contact.surname) &&
+                    this.phoneHome.equals(contact.phoneHome) &&
+                    this.phoneWork.equals(contact.phoneWork) &&
+                    this.email.equals(contact.email));
+        }
+        return false;
     }
 
     public String getName() {
