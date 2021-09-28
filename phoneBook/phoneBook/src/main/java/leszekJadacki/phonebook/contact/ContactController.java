@@ -8,6 +8,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @Controller
@@ -44,26 +45,17 @@ public class ContactController {
         return contactService.validate(contact);
     }
 
-    public ResponseEntity<?> deleteContact(List<Contact> contacts,
-                                           String fName,
-                                           String lName,
-                                           String phoneHome,
-                                           String phoneWork,
-                                           String email) {
-        return contactService.delete(contacts, fName, lName, phoneHome, phoneWork, email);
+    public ResponseEntity<?> deleteContact(List<Contact> contacts, Map<String, String> params) {
+        return contactService.delete(contacts, params);
     }
 
-    public List<Contact> filterContacts(List<Contact> contacts,
-                                        String fName,
-                                        String lName,
-                                        String phoneHome,
-                                        String phoneWork,
-                                        String email,
-                                        String photo){
-        return contactService.filterContacts(contacts, fName, lName, phoneHome, phoneWork, email, photo);
+    public List<Contact> filterContacts(List<Contact> contacts, Map<String, String> filterParams){
+        return contactService.filterContacts(contacts, filterParams);
     }
 
-    public Contact updateContact(List<Contact> contacts, String name, String surname, String phoneHome, String phoneWork, String email, String photo, Contact contact) {
-        return contactService.updateContact(filterContacts(contacts, name, surname, phoneHome, phoneWork, email, photo), contact);
+    public Contact updateContact(List<Contact> contacts,
+                                 Map<String, String> searchForUpdate,
+                                 Map<String, String> newContactDetails) {
+        return contactService.updateContact(filterContacts(contacts, searchForUpdate), newContactDetails);
     }
 }

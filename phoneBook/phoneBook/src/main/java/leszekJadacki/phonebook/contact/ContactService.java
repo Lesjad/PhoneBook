@@ -1,19 +1,24 @@
 package leszekJadacki.phonebook.contact;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.NonUniqueResultException;
+import java.security.Timestamp;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 
 @Service
 public class ContactService {
-    private ContactRepository contactRepository;
+    private final ContactRepository contactRepository;
+    private final Logger log = Logger.getLogger(this.getClass().getSimpleName());
 
     @Autowired
     public ContactService(ContactRepository contactRepository) {
@@ -66,19 +71,8 @@ public class ContactService {
         return true;
     }
 
-    public ResponseEntity<?> delete(List<Contact> contacts,
-                         String fName,
-                         String lName,
-                         String phoneHome,
-                         String phoneWork,
-                         String email) {
-        contacts = filterContacts(contacts,
-                        fName,
-                        lName,
-                        phoneHome,
-                        phoneWork,
-                        email,
-                        null);
+    public ResponseEntity<?> delete(List<Contact> contacts, Map<String, String> params) {
+        contacts = filterContacts(contacts, params);
         if (contacts.size()==0)
             return ResponseEntity.notFound().build();
 
@@ -93,7 +87,7 @@ public class ContactService {
     }
 
     public Contact updateContact(List<Contact> contacts,
-                                 Contact newContact){
+                                 Map<String, String> newContactDetails){
         Contact contact;
         if (contacts.size() > 1) {
             throw new NonUniqueResultException("found more than one contact match for change");
@@ -103,62 +97,31 @@ public class ContactService {
             contact = contacts.get(0);
         }
 
-        if (newContact.getName()!=null && !newContact.getName().equals(contact.getName()) && !newContact.getName().isBlank())
-            contact.setName(newContact.getName());
-        if (newContact.getSurname()!=null && !newContact.getSurname().equals(contact.getSurname()) && !newContact.getSurname().isBlank())
-            contact.setSurname(newContact.getSurname());
-        if (newContact.getPhoneHome()!=null && !newContact.getPhoneHome().equals(contact.getPhoneHome()) && !newContact.getPhoneHome().isBlank())
-            contact.setPhoneHome(newContact.getPhoneHome());
-        if (newContact.getPhoneWork()!=null && !newContact.getPhoneWork().equals(contact.getPhoneWork()) && !newContact.getPhoneWork().isBlank())
-            contact.setPhoneWork(newContact.getPhoneWork());
-        if (newContact.getEmail()!=null && !newContact.getEmail().equals(contact.getEmail()) && !newContact.getEmail().isBlank())
-            contact.setEmail(newContact.getEmail());
-        if (newContact.getPhoto()!=null && !newContact.getPhoto().equals(contact.getPhoto()) && !newContact.getPhoto().isBlank())
-            contact.setPhoto(newContact.getPhoto());
+        contact.setName(newContactDetails.getOrDefault("name", contact.getName()));
+        contact.setSurname(newContactDetails.getOrDefault("surname", contact.getSurname()));
+        contact.setPhoneHome(newContactDetails.getOrDefault("phoneHome", contact.getPhoneHome()));
+        contact.setPhoneWork(newContactDetails.getOrDefault("phoneWork", contact.getPhoneWork()));
+        contact.setEmail(newContactDetails.getOrDefault("email", contact.getEmail()));
+        contact.setPhoto(newContactDetails.getOrDefault("photo", contact.getPhoto()));
 
-        System.out.println("newContact: "+newContact);
-        System.out.println("return: " + contact);
+        log.info("new Contact details: " + newContactDetails);
+        log.info("updated: " + contact);
+
         //TODO: further business logic to safely update contact (for instance if name already exists)
         return contact;
     }
 
-    public List<Contact> filterContacts(List<Contact> contacts,
-                                        String fName,
-                                        String lName,
-                                        String phoneHome,
-                                        String phoneWork,
-                                        String email,
-                                        String photo) {
-        if (fName!=null && !fName.isBlank()){
-            contacts = contacts.stream()
-                    .filter(contact -> contact.getName().equals(fName))
-                    .collect(Collectors.toList());
-        }
-        if (lName!=null && !lName.isBlank()){
-            contacts = contacts.stream()
-                    .filter(contact -> contact.getSurname().equals(lName))
-                    .collect(Collectors.toList());
-        }
-        if (phoneHome!=null && !phoneHome.isBlank()){
-            contacts = contacts.stream()
-                    .filter(contact -> contact.getPhoneHome().equals(phoneHome))
-                    .collect(Collectors.toList());
-        }
-        if (phoneWork!=null && !phoneWork.isBlank()){
-            contacts = contacts.stream()
-                    .filter(contact -> contact.getPhoneWork().equals(phoneWork))
-                    .collect(Collectors.toList());
-        }
-        if (email!=null && !email.isBlank()){
-            contacts = contacts.stream()
-                    .filter(contact -> contact.getEmail().equals(email))
-                    .collect(Collectors.toList());
-        }
-        if (photo!=null && !photo.isBlank()){
-            contacts = contacts.stream()
-                    .filter(contact -> contact.getPhoto().equals(photo))
-                    .collect(Collectors.toList());
-        }
+    public List<Contact> filterContacts(List<Contact> contacts, Map<String, String> params) {
+
+        contacts = contacts.stream()
+                .filter(contact -> contact.getName().equals(params.getOrDefault("name", contact.getName())))
+                .filter(contact -> contact.getSurname().equals(params.getOrDefault("surname", contact.getSurname())))
+                .filter(contact -> contact.getPhoneHome().equals(params.getOrDefault("phoneHome", contact.getPhoneHome())))
+                .filter(contact -> contact.getPhoneWork().equals(params.getOrDefault("phoneWork", contact.getPhoneWork())))
+                .filter(contact -> contact.getEmail().equals(params.getOrDefault("email", contact.getEmail())))
+                .filter(contact -> contact.getPhoto().equals(params.getOrDefault("photo", contact.getPhoto())))
+                .collect(Collectors.toList());
+
         return contacts;
     }
 }
