@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 @Transactional
 public class AppUserService {
 
-    private Logger log = Logger.getLogger(this.getClass().getName());
+    private final Logger log = Logger.getLogger(this.getClass().getName());
     private final AppUserRepository userRepository;
     private final RoleRepository roleRepository;
 
@@ -102,15 +102,5 @@ public class AppUserService {
     public boolean userAuthentication(String login, String password){
         AppUser user = userRepository.findByLogin(login).orElseThrow(() -> new NoSuchElementException("Authentication failed. User not found"));
         return user.getPassword().equals(password);
-    }
-
-    @Transactional
-    public void updateContactData(String userLogin, Contact oldContact, Contact newContact) {
-        AppUser user = userRepository.findByLogin(userLogin).orElseThrow(() -> new NoSuchElementException("Authentication failed. user not found"));
-
-        if (user.getContactList().contains(oldContact)){
-            user.getContactList().remove(oldContact);
-            user.getContactList().add(newContact);
-        }
     }
 }

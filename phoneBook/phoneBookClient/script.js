@@ -1,3 +1,6 @@
+//Setup test variable
+const mockBasicAuth = true;
+
 //URL's used to communicate with backend
 const baseUrl = "http://localhost:8080/";
 const endpoint_SaveUser = "api/save-user/";
@@ -215,7 +218,7 @@ function displayContacts() {
     fetchQuery(baseUrl + endpoint_GetUserContacts).then(resolved => {
         fillContactsTable(resolved);
     }, rejected => {
-        console.log("czy ja tu w ogóle docieram?");
+        console.log("displayContacts() -> fetchQuery rejected!");
         fillContactsTable(null);
     });
 }
@@ -279,8 +282,9 @@ async function createNewUser() {
 
     var jsonObj = JSON.stringify(mapFormData(form_NewUser));
     postData(baseUrl + endpoint_SaveUser, jsonObj).then(resolved => {
-        console.log("createNewUser => then"); 
-        displayUsers(baseUrl + endpoint_GetUsers)});
+        console.log("createNewUser => then");
+        displayUsers(baseUrl + endpoint_GetUsers)
+    });
 }
 
 function createNewContact() {
@@ -289,9 +293,9 @@ function createNewContact() {
     var jsonObj = JSON.stringify(mapFormData(form_NewContact));
     console.log(jsonObj);
 
-    fetchQuery(baseUrl+endpoint_AddContact, METHOD_POST, jsonObj).then(result => {
+    fetchQuery(baseUrl + endpoint_AddContact, METHOD_POST, jsonObj).then(result => {
         console.log(result);
-        if (result["status"]>210) {
+        if (result["status"] > 210) {
             window.alert(result["message"])
         } else {
             displayContacts();
@@ -306,14 +310,16 @@ function createNewContact() {
 }
 
 function deleteContact() {
-    let query = "";
-    for (let index = 0; index < form_NewContact.length; index++) {
-        const element = form_NewContact[index];
-        if (element.name && element.value) {
-            query += element.name + "=" + element.value + "&&";
-        }
-    }
-    deleteData(baseUrl + endpoint_DeleteContact + query, null);
+    let query = new URL(baseUrl + endpoint_DeleteContact);
+    let newContactData = mapNonNullData(form_NewContact);
+
+    Object.keys(newContactData).forEach(key => {
+        query.searchParams.append(key, newContactData[key])
+    });
+
+    fetchQuery(query, METHOD_DELETE).then((resolved) => {
+        displayContacts();
+    });
 }
 
 function updateContact() {
@@ -327,32 +333,12 @@ function updateContact() {
         query.searchParams.append(key, oldContactData[key]);
     });
 
-    fetchQuery(query, method, requestBody).then(() => displayContacts());
-}
-
-function getData(url, jsnoObj) {
-    console.info("getData() invoked");
-
-    // Sending and receiving data in JSON format using GET method
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.setRequestHeader("login", select_AuthenticationLogin.value);
-    xhr.setRequestHeader("password", input_AuthenticationPassword.value);
-
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            var json = JSON.parse(xhr.responseText);
-            if (xhr.status === 500) {
-                window.alert(json.message);
-            } else if (xhr.status === 201) {
-                console.log(json);
-            }
+    fetchQuery(query, method, requestBody).then((resolved) => {
+        if (resolved.status && resolved.status != 200) {
+            window.alert(resolved.message);
         }
-    };
-    xhr.send(jsnoObj);
-
-    return json;
+        displayContacts();
+    });
 }
 
 async function postData(url, jsnoObj) {
@@ -364,20 +350,28 @@ async function postData(url, jsnoObj) {
 
     xhr.open("POST", url, true);
     xhr.setRequestHeader("Content-Type", "application/json");
+    //to be fixed with Login Form authentication
     xhr.setRequestHeader("login", select_AuthenticationLogin.value);
     xhr.setRequestHeader("password", input_AuthenticationPassword.value);
+    //FOR PURPOSE OF TESTING
+    if (mockBasicAuth) {
+        xhr.setRequestHeader("Authorization", "Basic " + window.btoa('testUser:password1'))
+    }
     xhr.onreadystatechange = function () {
         console.log("xhr.readyState: " + xhr.readyState);
         if (xhr.readyState === 4) {
-            json = JSON.parse(xhr.responseText);
+            if (xhr.responseText) {
+                json = JSON.parse(xhr.responseText);
+            } else {
+                json = {};
+            }
             if (xhr.status === 500) {
                 window.alert(json.message);
             } else if (xhr.status === 201) {
                 console.log(json);
             }
-            if (xhr.status>210) {
+            if (xhr.status > 210) {
                 console.log(xhr.status);
-                return Promise.reject("bo tak..")
             }
         }
     };
@@ -391,9 +385,13 @@ function deleteData(url, jsnoObj) {
     var xhr = new XMLHttpRequest();
     xhr.open("DELETE", url, true);
     xhr.setRequestHeader("Content-Type", "application/json");
+    //to be fixed with LoginForm authentication
     xhr.setRequestHeader("login", select_AuthenticationLogin.value);
     xhr.setRequestHeader("password", input_AuthenticationPassword.value);
-
+    //FOR PURPOSE OF TESTING
+    if (mockBasicAuth) {
+        xhr.setRequestHeader("Authorization", "Basic " + window.btoa('testUser:password1'))
+    }
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             var json = JSON.parse(xhr.responseText);
@@ -401,29 +399,8 @@ function deleteData(url, jsnoObj) {
                 window.alert(json.message);
             } else if (xhr.status === 201) {
                 console.log(json);
-            }
-        }
-    };
-    xhr.send(jsnoObj);
-}
-
-function putData(url, jsnoObj) {
-    console.info("putData() invoked");
-
-    // Sending and receiving data in JSON format using GET method
-    var xhr = new XMLHttpRequest();
-    xhr.open("PUT", url, true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.setRequestHeader("login", select_AuthenticationLogin.value);
-    xhr.setRequestHeader("password", input_AuthenticationPassword.value);
-
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            var json = JSON.parse(xhr.responseText);
-            if (xhr.status === 500) {
-                window.alert(json.message);
-            } else if (xhr.status === 201) {
-                console.log(json);
+            } else if (xhr.status > 208) {
+                window.alert(json.message)
             }
         }
     };
@@ -448,11 +425,17 @@ async function fetchQuery(query, method, body) {
         "headers": new Headers({
             'content-type': 'application/json',
             'login': getActivUser(),
-            'password': input_AuthenticationPassword.value
+            'password': input_AuthenticationPassword.value,
         }),
         "body": body
     }
 
+    //Header for Basic Auth testing
+    if (mockBasicAuth) {
+        options.headers.append('Authorization', 'Basic ' + window.btoa("testUser:password1"))
+    }
+
+    console.log(options);
     console.log("fetching: " + query);
     myResponse = await fetch(query, options);
     myObject = await myResponse.json();

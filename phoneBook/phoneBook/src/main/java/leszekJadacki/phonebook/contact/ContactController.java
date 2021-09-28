@@ -50,7 +50,7 @@ public class ContactController {
                                            String phoneHome,
                                            String phoneWork,
                                            String email) {
-        return ResponseEntity.ok().body(contactService.delete(contacts, fName, lName, phoneHome, phoneWork, email));
+        return contactService.delete(contacts, fName, lName, phoneHome, phoneWork, email);
     }
 
     public List<Contact> filterContacts(List<Contact> contacts,
@@ -62,16 +62,8 @@ public class ContactController {
                                         String photo){
         return contactService.filterContacts(contacts, fName, lName, phoneHome, phoneWork, email, photo);
     }
-    public List<Contact> filterContacts(List<Contact> contacts,
-                                 String fName,
-                                 String lName,
-                                 String phoneHome,
-                                 String phoneWork,
-                                 String email){
-        return filterContacts(contacts, fName, lName, phoneHome, phoneWork, email, null);
-    }
 
-    public Contact updateContact(List<Contact> contacts, String name, String surname, String phoneHome, String phoneWork, String email, Contact contact) {
-        return contactService.updateContact(filterContacts(contacts, name, surname, phoneHome, phoneWork, email), contact);
+    public Contact updateContact(List<Contact> contacts, String name, String surname, String phoneHome, String phoneWork, String email, String photo, Contact contact) {
+        return contactService.updateContact(filterContacts(contacts, name, surname, phoneHome, phoneWork, email, photo), contact);
     }
 }

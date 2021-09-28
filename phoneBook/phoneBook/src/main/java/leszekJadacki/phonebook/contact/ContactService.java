@@ -5,9 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.NonUniqueResultException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+
 
 @Service
 public class ContactService {
@@ -80,8 +82,11 @@ public class ContactService {
         if (contacts.size()==0)
             return ResponseEntity.notFound().build();
 
-        if (contacts.size()>1)
-            return ResponseEntity.badRequest().body(this.getClass().getSimpleName()+": found multiple contacts. Try more precise request");
+        if (contacts.size()>1){
+            HashMap message = new HashMap<String, String>();
+            message.put("message","found multiple contacts. Try more precise request");
+            return ResponseEntity.badRequest().body(message);
+        }
 
         contactRepository.delete(contacts.get(0));
         return ResponseEntity.ok().body("contact successfully deleted");
@@ -136,12 +141,12 @@ public class ContactService {
         }
         if (phoneHome!=null && !phoneHome.isBlank()){
             contacts = contacts.stream()
-                    .filter(contact -> contact.getPhoneHome().equals(lName))
+                    .filter(contact -> contact.getPhoneHome().equals(phoneHome))
                     .collect(Collectors.toList());
         }
         if (phoneWork!=null && !phoneWork.isBlank()){
             contacts = contacts.stream()
-                    .filter(contact -> contact.getPhoneWork().equals(lName))
+                    .filter(contact -> contact.getPhoneWork().equals(phoneWork))
                     .collect(Collectors.toList());
         }
         if (email!=null && !email.isBlank()){
@@ -151,7 +156,7 @@ public class ContactService {
         }
         if (photo!=null && !photo.isBlank()){
             contacts = contacts.stream()
-                    .filter(contact -> contact.getPhoto().equals(lName))
+                    .filter(contact -> contact.getPhoto().equals(photo))
                     .collect(Collectors.toList());
         }
         return contacts;

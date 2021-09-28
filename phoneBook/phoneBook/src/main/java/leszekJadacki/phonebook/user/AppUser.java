@@ -18,6 +18,7 @@ public class AppUser {
     private Long id;
 
     private String userName;
+    @Column(unique = true)
     private String login;
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)
