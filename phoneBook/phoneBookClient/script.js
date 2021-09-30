@@ -3,15 +3,16 @@ const mockBasicAuth = true;
 
 //URL's used to communicate with backend
 const baseUrl = "http://localhost:8080/";
-const endpoint_SaveUser = "api/save-user/";
-const endpoint_GetUsers = "api/get-users/";
-const endpoint_SaveRole = "api/save-role/";
-const endpoint_GetUserContacts = "api/get-contacts/";
-const endpoint_AddContact = "api/add-contact-to-user/";
-const endpoint_DeleteContact = "api/delete-contact?";
-const endpoint_UpdateContact = "api/update-contact/";
+const endpoint_SaveUser = "api/user/";
+const endpoint_GetUsers = "api/users/";
+const endpoint_SaveRole = "api/role/";
+const endpoint_GetUserContacts = "api/contacts/";
+const endpoint_AddContact = "api/user/contact/";
+const endpoint_DeleteContact = "api/contact/";
+const endpoint_UpdateContact = "api/contact/";
 const endpoint_GetContact = "api/search-for-contact/";
 
+//constant strings
 const METHOD_GET = "GET";
 const METHOD_PUT = "PUT";
 const METHOD_DELETE = "DELETE";
