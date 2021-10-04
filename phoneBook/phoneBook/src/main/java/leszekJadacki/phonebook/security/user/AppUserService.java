@@ -36,32 +36,30 @@ public class AppUserService implements UserDetailsService {
     }
 
     public AppUser saveUser(AppUser user) {
-        log.info(String.format("checking if user \"%s\" exist in database", user.getLogin()));
 
         userRepository.findUserByLogin(user.getLogin()).ifPresentOrElse(optionalUser -> {
+            log.info(String.format("user \"%s\" already exist in database", user.getLogin()));
             throw new IllegalArgumentException(String.format("login \"%s\" already taken", user.getLogin()));
         }, () -> log.info(String.format("Saving user \"%s\" to the database", user.getUserName())));
 
-        return validate(user)? userRepository.save(user) : null;
+        return validate(user) ? userRepository.save(user) : null;
     }
 
     private boolean validate(AppUser user) {
-        if (user.getLogin() == null || user.getLogin().isBlank()) {
+        if (user.getLogin() == null || user.getLogin().isBlank())
             throw new IllegalArgumentException("Login cannot be blank");
-        }
-        if (user.getUserName() == null || user.getUserName().isBlank()) {
+        if (user.getUserName() == null || user.getUserName().isBlank())
             throw new IllegalArgumentException("User name cannot be blank");
-        }
-        if (user.getPassword() == null || user.getPassword().isBlank()) {
+        if (user.getPassword() == null || user.getPassword().isBlank())
             throw new IllegalArgumentException("Password cannot be empty");
-        }
+
         return true;
     }
 
     public AppUserPermission savePermission(String permissionName) {
-        log.info(String.format("checking if permission: %s exist in database", permissionName));
 
         permissionRepository.findByName(permissionName).ifPresentOrElse(permission -> {
+                    log.info(String.format("permission: \"%s\" already exist in database", permissionName));
                     throw new IllegalArgumentException(String.format("Permission %s already exist", permissionName));
                 }, () -> log.info(String.format("Saving permission \"%s\" to the database", permissionName))
         );
@@ -69,9 +67,9 @@ public class AppUserService implements UserDetailsService {
     }
 
     public AppUserRole saveRole(String roleName) {
-        log.info(String.format("checking if role: %s exist in database", roleName));
 
         roleRepository.findByName(roleName).ifPresentOrElse(role -> {
+            log.info(String.format("role: \"%s\" exist in database", roleName));
                     throw new IllegalStateException(String.format("Role \"%s\" already exist", roleName));
                 }, () -> log.info(String.format("Saving role \"%s\" to the database", roleName))
         );
@@ -81,42 +79,36 @@ public class AppUserService implements UserDetailsService {
 
     public void addRoleToUser(String login, String roleName) {
         AppUser user = userRepository.findUserByLogin(login).
-                orElseThrow(() -> new NoSuchElementException("user " + login + " could not be found"));
+                orElseThrow(() -> new NoSuchElementException(String.format("user \"%s\" could not be found", login)));
         AppUserRole role = roleRepository.findByName(roleName).
-                orElseThrow(() -> new NoSuchElementException("role " + roleName + " could not be found"));
+                orElseThrow(() -> new NoSuchElementException(String.format("role \"%s\" could not be found", roleName)));
 
-        log.info("Adding role " + roleName + " to the user " + user.getUserName());
+        log.info(String.format("Adding role \"%s\" to user \"%s\"", roleName, user.getLogin()));
         user.getRoles().add(role);
     }
 
     public AppUser getUser(String login) {
-        log.info("Fetching user " + login + " from the database");
+        log.info(String.format("Fetching user %s from the database", login));
         return userRepository.findUserByLogin(login)
-                .orElseThrow(() -> new NoSuchElementException("User with login: " + login + " does not exist in database"));
+                .orElseThrow(() -> new NoSuchElementException(String.format("User with login \"%s\" does not exist in database", login)));
     }
 
     public List<AppUser> getUsers() {
-        log.info("Getting all users");
         return userRepository.findAll();
     }
 
     public Collection<Contact> getContactsOfUser(String login) {
-        log.info("reading contacts of user: " + login);
+        log.info(String.format("reading contacts of user \"%s\"", login));
         return userRepository.findUserByLogin(login)
-                .orElseThrow(() -> new NoSuchElementException("User with login " + login + " could not be found in database"))
+                .orElseThrow(() -> new NoSuchElementException(String.format("User with login \"%s\" could not be found in database", login)))
                 .getContactList();
     }
 
     public AppUser addContactToUser(AppUser user, Contact contact) {
         userRepository.findUserByLogin(user.getLogin())
-                .orElseThrow(() -> new NoSuchElementException("Authentication failed. User not found"))
+                .orElseThrow(() -> new NoSuchElementException("User not found"))
                 .getContactList().add(contact);
         return user;
-    }
-
-    public boolean userAuthentication(String login, String password) {
-        AppUser user = userRepository.findUserByLogin(login).orElseThrow(() -> new NoSuchElementException("Authentication failed. User not found"));
-        return user.getPassword().equals(password);
     }
 
     @Override
@@ -125,8 +117,9 @@ public class AppUserService implements UserDetailsService {
     }
 
     public void addPermissionToRole(String roleName, String permissionName) {
+        log.info(String.format("saving permission: \"%s\" to role: \"%s\"", permissionName, roleName));
         roleRepository.findByName(roleName)
-                .orElseThrow(() -> new NoSuchElementException(String.format("Role %s not found", roleName)))
+                .orElseThrow(() -> new NoSuchElementException(String.format("Role \"%s\" not found", roleName)))
                 .addPermission(permissionRepository.findByName(permissionName)
                         .orElseThrow(() -> new NoSuchElementException(String.format("Permission %s not found", permissionName))));
     }

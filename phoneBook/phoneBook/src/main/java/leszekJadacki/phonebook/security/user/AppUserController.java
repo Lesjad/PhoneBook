@@ -30,12 +30,13 @@ public class AppUserController {
         this.userService = userService;
         this.contactController = contactController;
     }
-//TODO: customResponseBody <- apply to all ResponseEntities
-    // @CrossOrigin(allowCredentials = "true", origins = "http://127.0.0.1:59836")
+
+    //TODO: customResponseBody <- apply to all ResponseEntities
+
     @CrossOrigin
     @PostMapping(path = "user")
     public ResponseEntity<AppUser> saveUser(@RequestBody AppUser user) {
-        log.info("saving new user...: " + user.getUserName());
+        log.info(String.format("saving user \"%s\" to the database.", user.getUserName()));
 
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("api/user").toUriString());
         ResponseEntity<AppUser> responseEntity = ResponseEntity.created(uri).body(userService.saveUser(user));
@@ -63,7 +64,6 @@ public class AppUserController {
         return userService.getUser(login);
     }
 
-    //@CrossOrigin(allowCredentials = "false", origins = "http://127.0.0.1:59836", allowedHeaders = {"authorization", "content-type" , "login" ,"password"})
     @CrossOrigin
     @GetMapping(path = "users")
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -74,54 +74,41 @@ public class AppUserController {
 
     @CrossOrigin
     @GetMapping(path = "contact")
+    @PreAuthorize("hasAuthority('contact:read')")
     public ResponseEntity<?> searchForContact(@RequestHeader(name = "login") String login,
-                                              @RequestHeader(name = "password") String password,
                                               @RequestParam Map<String, String> params) {
-        boolean passwordCorrect = userService.userAuthentication(login, password);
-        log.info("Authentication result: " + (passwordCorrect ? "positive" : "negative"));
 
-        return passwordCorrect ?
-                ResponseEntity.ok()
-                        .body(contactController.filterContacts(
-                                (List<Contact>) userService.getContactsOfUser(login),
-                                params)) :
-                ResponseEntity.status(401).body("Authentication failed");
+        return ResponseEntity.ok()
+                .body(contactController.filterContacts(
+                        (List<Contact>) userService.getContactsOfUser(login),
+                        params));
     }
 
     @CrossOrigin
     @GetMapping(path = "contacts")
     @PreAuthorize("hasAuthority('contact:read')")
-    public ResponseEntity<?> getContactsOfUser(@RequestHeader(name = "login") String login,
-                                               @RequestHeader(name = "password") String password) {
+    public ResponseEntity<?> getContactsOfUser(@RequestHeader(name = "login") String login) {
 
-        boolean passwordCorrect = userService.userAuthentication(login, password);
-        log.info("Authentication result: " + (passwordCorrect ? "positive" : "negative"));
-
-        return passwordCorrect ? ResponseEntity.ok().body(userService.getContactsOfUser(login)) :
-                ResponseEntity.status(401).body("Authentication failed");
+        return ResponseEntity.ok().body(userService.getContactsOfUser(login));
     }
 
     @CrossOrigin
     @PostMapping(path = "user/contact", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('contact:write')")
     public ResponseEntity<?> addContactToUser(@RequestHeader(name = "login") String userLogin,
-                                              @RequestHeader(name = "password") String password,
                                               @RequestBody Contact contact) {
-        if (userService.userAuthentication(userLogin, password)) {
-            AppUser user = userService.getUser(userLogin);
-            if (user.getContactList().contains(contact)) {
-                return ResponseEntity.badRequest().body(new AppResponseBody
-                        .AppResponseBodyBuilder("contact already on the list")
-                        .status(HttpStatus.BAD_REQUEST.value())
-                        .build());
-            } else {
-                contactController.validate(contact);
-                contactController.addContact(contact);
-                userService.addContactToUser(user, contact);
-                return ResponseEntity.ok().body(user.getContactList());
-            }
+        AppUser user = userService.getUser(userLogin);
+        if (user.getContactList().contains(contact)) {
+            return ResponseEntity.badRequest().body(new AppResponseBody
+                    .AppResponseBodyBuilder("contact already on the list")
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .build());
+        } else {
+            contactController.validate(contact);
+            contactController.addContact(contact);
+            userService.addContactToUser(user, contact);
+            return ResponseEntity.ok().body(user.getContactList());
         }
-        return ResponseEntity.status(401).body(this.getClass().getSimpleName() + "Authentication failed");
     }
 
     @CrossOrigin
@@ -129,19 +116,14 @@ public class AppUserController {
     @PutMapping(path = "contact")
     @PreAuthorize("hasAuthority('contact:write')")
     public ResponseEntity<?> updateContact(@RequestHeader(name = "login") String userLogin,
-                                           @RequestHeader(name = "password") String password,
                                            @RequestParam Map<String, String> searchForUpdate,
                                            @RequestBody Map<String, String> newContactDetails) {
 
-        if (userService.userAuthentication(userLogin, password)) {
-            List<Contact> contacts = (List<Contact>) userService.getContactsOfUser(userLogin);
+        List<Contact> contacts = (List<Contact>) userService.getContactsOfUser(userLogin);
 
-            return ResponseEntity.ok()
-                    .body(contactController
-                            .updateContact(contacts, searchForUpdate, newContactDetails));
-        }
-
-        return ResponseEntity.status(401).body(this.getClass().getSimpleName() + "Authentication failed");
+        return ResponseEntity.ok()
+                .body(contactController
+                        .updateContact(contacts, searchForUpdate, newContactDetails));
 
     }
 
@@ -149,11 +131,7 @@ public class AppUserController {
     @DeleteMapping(path = "contact")
     @PreAuthorize("hasAuthority('contact:write')")
     public ResponseEntity<?> deleteContact(@RequestHeader(name = "login") String login,
-                                           @RequestHeader(name = "password") String password,
                                            @RequestParam Map<String, String> params) {
-        if (!userService.userAuthentication(login, password)) {
-            return ResponseEntity.status(401).body(this.getClass().getSimpleName() + "Authentication failed");
-        }
         List<Contact> contacts = (List<Contact>) userService.getUser(login).getContactList();
 
         return contactController.deleteContact(contacts, params);

@@ -33,7 +33,7 @@ public class ContactController {
     }
 
     public ResponseEntity<Contact> addContact(Contact contact){
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("api/post-contact").toUriString());
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("api/contact").toUriString());
         return ResponseEntity.created(uri).body(contactService.addContact(contact));
     }
 

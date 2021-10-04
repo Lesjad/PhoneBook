@@ -11,10 +11,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Logger;
 
 @Entity
 @Table
 public class AppUser implements UserDetails {
+    @Transient
+    private final Logger log = Logger.getLogger(this.getClass().getName());
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
@@ -28,12 +33,10 @@ public class AppUser implements UserDetails {
     private boolean isAccountNonLocked;
     private boolean isCredentialsNonExpired;
     private boolean isEnabled;
-    @Transient
-    private Collection<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
 
     //custom fields
     @ManyToMany(fetch = FetchType.EAGER)
-    private Collection<AppUserRole> roles = new ArrayList<>();
+    private Set<AppUserRole> roles;
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(fetch = FetchType.LAZY)
@@ -52,7 +55,7 @@ public class AppUser implements UserDetails {
                    boolean isAccountNonLocked,
                    boolean isCredentialsNonExpired,
                    boolean isEnabled,
-                   Collection<AppUserRole> roles,
+                   Set<AppUserRole> roles,
                    Collection<Contact> contactList) {
         this.userName = userName;
         this.login = login;
@@ -67,6 +70,10 @@ public class AppUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        Set<SimpleGrantedAuthority> grantedAuthorities = new HashSet<>();
+        roles.forEach(appUserRole -> {
+            grantedAuthorities.addAll(appUserRole.getGrantedAuthorities());
+        });
         return grantedAuthorities;
     }
 
@@ -133,9 +140,8 @@ public class AppUser implements UserDetails {
         return roles;
     }
 
-    public void setRoles(Collection<AppUserRole> roles) {
+    public void setRoles(Set<AppUserRole> roles) {
         this.roles = roles;
-        setGrantedAuthorities();
     }
 
     public Collection<Contact> getContactList() {
@@ -155,10 +161,5 @@ public class AppUser implements UserDetails {
                 "password='" + password + '\'' +
                 "roles='" + roles + '\'' +
                 "}";
-    }
-
-    private void setGrantedAuthorities(){
-        this.getRoles().forEach(appUserRole ->
-                grantedAuthorities.addAll(appUserRole.getGrantedAuthorities()));
     }
 }

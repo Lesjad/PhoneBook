@@ -356,7 +356,7 @@ async function postData(url, jsnoObj) {
     xhr.setRequestHeader("password", input_AuthenticationPassword.value);
     //FOR PURPOSE OF TESTING
     if (mockBasicAuth) {
-        xhr.setRequestHeader("Authorization", "Basic " + window.btoa('testUser:password1'))
+        xhr.setRequestHeader("Authorization", "Basic " + window.btoa(select_AuthenticationLogin.value+':'+input_AuthenticationPassword.value))
     }
     xhr.onreadystatechange = function () {
         console.log("xhr.readyState: " + xhr.readyState);
@@ -426,14 +426,13 @@ async function fetchQuery(query, method, body) {
         "headers": new Headers({
             'content-type': 'application/json',
             'login': getActivUser(),
-            'password': input_AuthenticationPassword.value,
         }),
         "body": body
     }
 
     //Header for Basic Auth testing
-    if (mockBasicAuth) {
-        options.headers.append('Authorization', 'Basic ' + window.btoa("testUser:password1"))
+    if (mockBasicAuth && select_AuthenticationLogin.value) {
+        options.headers.append('Authorization', 'Basic ' + window.btoa(getActivUser()+":"+input_AuthenticationPassword.value))
     }
 
     console.log(options);

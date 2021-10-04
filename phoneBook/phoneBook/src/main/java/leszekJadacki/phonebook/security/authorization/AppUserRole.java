@@ -6,16 +6,19 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Entity
 public class AppUserRole {
+    @Transient
+    private Logger log = Logger.getLogger(this.getClass().getName());
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
     private final String name;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private final Collection<AppUserPermission> permissions = new ArrayList<>();
 
     public AppUserRole(){
